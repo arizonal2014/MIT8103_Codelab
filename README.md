@@ -1,6 +1,6 @@
 # MIT 8103 Advanced Database Systems Codelab
 
-[Open the step-by-step tutorial](https://arizonal2014.github.io/MIT8103_Codelab/).
+[Start the step-by-step tutorial](01_Create_Your_Repository.md).
 
 This step-by-step guide helps you complete the MIT 8103 continuous assessment. Choose a case study, use it for all five portfolio activities, and save evidence of your work as you go.
 

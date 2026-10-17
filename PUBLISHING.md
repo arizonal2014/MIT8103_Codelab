@@ -1,6 +1,8 @@
 # Publishing the codelab
 
-Read the tutorial: https://arizonal2014.github.io/MIT8103_Codelab/
+Read and share the tutorial now: https://github.com/arizonal2014/MIT8103_Codelab#readme
+
+The compiled website is configured at https://arizonal2014.github.io/MIT8103_Codelab/. Its deployment succeeds, but the account-level Pages custom domain currently redirects visitors to an unresolved domain. The repository guide above works independently. Changing the account-level domain needs the owner's approval because it affects the existing site.
 
 The 19 numbered Markdown files are the tutorial source. Examples, images and the final summary are included. The library demonstration portfolio is separate: https://github.com/arizonal2014/Harrison_Perete_202600001.
 
