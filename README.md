@@ -4,6 +4,8 @@
 
 This step-by-step guide helps you complete the MIT 8103 continuous assessment. Choose a case study, use it for all five portfolio activities, and save evidence of your work as you go.
 
+For a complete worked example, see the [Library Borrowing System portfolio](https://github.com/arizonal2014/Harrison_Perete_202600001). Use it as a reference for the structure, scripts and evidence while developing your own case study and results.
+
 ## What you will produce
 
 The assessment is worth 40 marks. You will submit practical database work and a short summary.
