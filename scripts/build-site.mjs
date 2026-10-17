@@ -15,7 +15,6 @@ const href = f => f === 'README.md' ? 'index.html' : f.replace(/\.md$/, '.html')
 const titles = new Map();
 for (const f of files) titles.set(f, (await fs.readFile(path.join(root,f),'utf8')).match(/^# (.+)/m)?.[1] ?? f);
 const markdown = new Marked({ gfm: true });
-const standardCode = markdown.defaults.renderer?.code;
 markdown.use({ renderer: {
   code({ text, lang }) {
     if (lang === 'mermaid') return `<img src="images/Library_ERDiagram.svg" alt="Library ER diagram showing all four tables and relationships"><details><summary>Diagram source</summary><pre><code>${esc(text)}</code></pre></details>`;
