@@ -1,0 +1,104 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 4 Choose and describe your case study | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a aria-current="page" href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 4 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="03_Create_Portfolio_Structure.html">← Previous</a><a href="05_Entities_Keys_Relationships.html">Next step →</a></nav><article><h1>Step 4 Choose and describe your case study</h1>
+<p>Section 2 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> asks you to choose a realistic system and use it throughout the portfolio. Section 4 requires a case-study description for Portfolio 1.</p>
+<h2>Choose a system</h2>
+<p>Choose a system you understand: a library, clinic, hotel, online shop, university results portal or another suitable organisation. You will use the same system for all five activities.</p>
+<p>Our demonstration uses a <strong>library borrowing system</strong>. You can follow the method with a different case study.</p>
+<h2>Describe what it does</h2>
+<p>Open your Portfolio 1 README in Explorer. Complete these headings using your own case study:</p>
+<pre><code class="language-markdown"># Portfolio 1 Database Design and Modelling
+
+## Case study
+[Name of your system and a short explanation of what it does.]
+
+## Users
+[Who uses the system and what each user does.]
+
+## Main operations
+[List the operations your database needs to support.]
+
+## Business rules
+[Number the rules that define valid data and operations.]
+
+## Scope
+[State what you include and what you leave out.]</code></pre><p>A business rule is a condition your system must follow. For example, one physical library copy cannot have two open loans at the same time. An open loan is a loan that has not been returned.</p>
+<h2>Demonstration example</h2>
+<p><strong>Case study:</strong> A library borrowing system stores members, book records, physical copies and loan history. Staff issue and return copies, while members borrow them. Staff can check availability and overdue loans.</p>
+<p><strong>Users:</strong> Members borrow and return copies. Library staff register members, maintain the catalogue, record loans and returns, and review overdue loans.</p>
+<p><strong>Main operations:</strong> Register a member; add a book and its copies; issue a loan; record a return; view available copies, member loan history and overdue loans.</p>
+<p><strong>Business rules:</strong></p>
+<ol>
+<li>Each member has a unique membership number and email address.</li>
+<li>Each physical copy has a unique barcode and belongs to one book record. A book record can have several copies.</li>
+<li>Each loan refers to one existing member and one existing copy.</li>
+<li>A copy can have at most one open loan at a time.</li>
+<li>A member can have several open loans, provided each involves a different available copy.</li>
+<li>The due date must be later than the borrowing date. Staff set the due date when issuing the loan.</li>
+<li>The return date is empty until return and cannot be earlier than the borrowing date.</li>
+<li>A return closes an open loan without deleting its history. A loan can be returned only once.</li>
+</ol>
+<p><strong>Scope:</strong> One library branch, fictional records and physical book lending. Fines, payments, reservations, author management and user authentication are outside this example.</p>
+<p>These rules are choices for this example, not additional assessment requirements. Choose rules that fit your own system.</p>
+<h2>Prompt</h2>
+<p>Enter your case-study name and paste the demonstration example where indicated. The AI will propose the users, operations, rules and scope for you to review. You do not need to work these out before using the prompt.</p>
+<pre><code class="language-text">I am completing the case-study description for MIT 8103 Portfolio 1.
+Use the worked library example below as a reference for structure,
+length and level of detail.
+
+REFERENCE EXAMPLE
+[PASTE THE LIBRARY EXAMPLE FROM CASE STUDY THROUGH SCOPE HERE]
+
+MY CHOSEN CASE STUDY
+[ENTER YOUR SYSTEM, FOR EXAMPLE HOTEL RESERVATION SYSTEM]
+
+Produce a case-study description for MY chosen system using exactly
+these headings, in this order:
+
+# Portfolio 1 Database Design and Modelling
+## Case study
+## Users
+## Main operations
+## Business rules
+## Scope
+
+Follow these limits:
+- Maximum 300 words for the description, excluding any assumption note.
+- Case study: one short paragraph of no more than three sentences.
+- Users: one short paragraph identifying the main roles and their tasks.
+- Main operations: one paragraph listing five to seven relevant actions.
+- Business rules: exactly eight numbered rules, each no more than two
+  short sentences. Include identifiers, relationships, valid values or
+  dates, and a rule that prevents a conflicting operation where relevant.
+- Scope: one short paragraph stating what is included and excluded.
+- Propose a small, practical scope suitable for this database assessment.
+  State what it includes and excludes. Use fictional data.
+
+Use my case-study name to propose suitable users, operations, eight
+business rules and scope. Produce a complete first draft without asking
+me to supply those details first. Incorporate any additional requirements
+I provide and briefly flag conflicts.
+Adapt the actual operations and rules to my system. Do not simply rename
+library terms or paraphrase its sentences.
+After the description, add one brief &quot;Assumptions to confirm&quot; note naming
+the main scope choices and proposed rules I should review.
+
+Write directly about the system in a style suitable for my individual
+assessment. Avoid instructor commentary or collective statements about
+what a class will or will not build. State scope neutrally.
+
+Return only the description and the assumption note.
+Do not add tables, attributes, SQL, an ER diagram, normalisation,
+implementation results, introductions or later portfolio activities.</code></pre><p>Review the proposed users, operations, eight rules and scope. Keep what fits your system and change anything you do not intend to implement. If a rule is unclear, ask the AI to explain it with a simple example. Save the agreed description under the five headings in your Portfolio 1 README and update the Case study paragraph in your root README to match. The assumption note is a review aid. The length and eight-rule limits are tutorial choices, not assessment requirements.</p>
+<h2>Save your progress</h2>
+<p>Run each line separately in the terminal:</p>
+<pre><code class="language-bash">git diff
+git add Harrison_Perete_202600001_README.md portfolio-1-database-design/Harrison_Perete_202600001_P1_README.md
+git commit -m &quot;Describe case study and business rules&quot;
+git push origin main
+git status</code></pre><p>Replace the demonstration filenames with yours. If <code>git diff</code> opens a scrolling view, press <strong>q</strong> to leave it before entering the next command.</p>
+<p><strong>Check:</strong> You can explain your users, operations and every business rule. The two README files describe the same system, and Git reports a clean working tree up to date with <code>origin/main</code>.</p>
+<p>Open your Portfolio 1 README on GitHub to confirm it was pushed. The demonstration looks like this:</p>
+<p><img src="images/09_Case_Study_On_GitHub.jpg" alt="Library case study and business rules saved in the Portfolio 1 README on GitHub"></p>
+<p>This completes the case-study description part of Portfolio 1. The ER diagram, schema, keys, constraints and normalisation still follow.</p>
+<p><strong>Next: <a href="05_Entities_Keys_Relationships.html">Step 5 — Identify entities, attributes, keys and relationships</a>.</strong></p>
+<p><a href="03_Create_Portfolio_Structure.html">Back to Step 3</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="03_Create_Portfolio_Structure.html">← Previous</a><a href="05_Entities_Keys_Relationships.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

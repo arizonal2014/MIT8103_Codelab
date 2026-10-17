@@ -1,0 +1,7 @@
+{
+  "name": "mit8103-codelab",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node scripts/build-site.mjs" },
+  "dependencies": { "marked": "17.0.5" }
+}

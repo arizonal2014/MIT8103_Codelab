@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MIT 8103 Advanced Database Systems: Portfolio Summary | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Contents · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="01_Create_Your_Repository.html">Start the codelab →</a></nav><article><h1>MIT 8103 Advanced Database Systems: Portfolio Summary</h1>
+<p><strong>Library Borrowing System</strong> | Perete Harrison | Student ID: 202600001 (demonstration ID)</p>
+<p>Worked example. Replace the identity, results, reflection and declaration with your own before submission.</p>
+<p>GitHub: <a href="https://github.com/arizonal2014/Harrison_Perete_202600001">arizonal2014/Harrison_Perete_202600001</a></p>
+<h2>Case study</h2>
+<p>The library records members, books, physical copies and loans. Staff register members, issue copies, record returns and check availability or overdue loans. Members borrow and return copies. The example covers one branch using fictional records. PostgreSQL holds lending records; MongoDB holds sample borrowing and return events. Both run in one GitHub Codespace.</p>
+<h2>Portfolio 1: Database Design and Modelling</h2>
+<p>The relational design has four tables: member, book, book_copy and loan. Separating books from physical copies allows several copies to share one title. Each table has a primary key. Foreign keys connect copies to books and loans to existing members and copies. Unique values identify membership numbers, emails, ISBNs and barcodes. Date checks reject invalid borrowing and return dates. A unique partial index permits only one open loan per copy [1].</p>
+<p>The normalisation examples show a borrowing list becoming one borrowing per row in 1NF. Copy details are separated from the combined borrowing key in 2NF. Member details and book titles move to their own tables in 3NF. The schema, ER diagram and normalisation tables are saved in Portfolio 1. Six invalid inserts are rejected by the intended rules. At that stage, the records contain two members, one book, three copies and three loans.</p>
+<p><img src="images/Library_ERDiagram.svg" alt="Library ER diagram: member, loan, book_copy and book"></p>
+<p>Figure 1. The four tables and their relationships. PK identifies a row, FK links tables and UK marks a unique value. Each loan belongs to one member and one copy; each copy belongs to one book. A member, copy or book can have zero or many related records.</p>
+<!-- PAGE BREAK -->
+
+<h2>Portfolio 2: Query Processing and Optimisation</h2>
+<p>Three queries retrieve open loans, available copies and loan counts per member. At this stage, there are two open loans; LIB003 is available; Ada has two loans and Ben has one. A separate table contains 100,000 generated closed-loan records for the speed test, leaving the original lending records unchanged.</p>
+<p>The same date-range count returns 24 before and after an index on borrowed_at. EXPLAIN (ANALYZE, BUFFERS) records the plan and actual execution [2]. After one warm-up in each phase, three measured runs give:</p>
+<table>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Before index</th>
+<th>After index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Scan</td>
+<td>Seq Scan</td>
+<td>Index Only Scan</td>
+</tr>
+<tr>
+<td>Median execution time</td>
+<td>7.941 ms</td>
+<td>0.039 ms</td>
+</tr>
+<tr>
+<td>Shared buffer hits, third run</td>
+<td>960</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>The index avoids scanning unrelated dates in this test. These cached, shared-Codespace measurements do not predict every workload. Indexes also require storage and maintenance.</p>
+<h2>Portfolio 3: Transactions and Concurrency</h2>
+<p>A return for LIB002 is saved with COMMIT. Repeating the conditional return changes zero rows. In another transaction, a valid LIB003 loan is followed by an invalid due date. ROLLBACK removes the unsaved loan while keeping the earlier committed return.</p>
+<p>Two sessions then use READ COMMITTED [3]. Session A inserts a LIB003 loan for Ben without committing. Session B cannot see that uncommitted loan and tries to lend the same copy to Ada. Its insert waits. After A commits, B receives a duplicate-key error from loan_one_open_copy and rolls back. The final result is one open LIB003 loan, belonging to Ben. This shows why an earlier availability check alone is insufficient. The index enforces the one-open-loan rule during concurrent inserts. The conditional return demonstrates the update workflow, not protection against every possible direct edit.</p>
+<h2>Portfolio 4: NoSQL and Advanced Data Models</h2>
+<p>MongoDB stores four documents in library_events.borrowing_events. Each event embeds member and copy details, a date and event-specific details. A borrowing contains a due date; a return contains the copy&#39;s condition. This keeps the information for one event together [4].</p>
+<p>The insert is acknowledged for E001-E004, and the count is four. The LIB002 query returns its borrowing followed by its return. Searching details.condition for good returns E002, Ada&#39;s return. These are separately entered sample events, not automatic PostgreSQL synchronisation or a complete audit log. Embedded names are snapshots. PostgreSQL remains responsible for lending constraints.</p>
+<!-- PAGE BREAK -->
+
+<h2>Portfolio 5: Distributed and Cloud Database Exercise</h2>
+<p>The discussion proposes three voting, data-holding MongoDB replica members on separate hosts and failure zones. A primary accepts event writes; secondaries copy changes. If a primary fails, a reachable majority can elect an eligible replacement. Writes pause during the election. Majority acknowledgement and possible secondary lag affect durability, availability and recent-event reads [5].</p>
+<p>Sharding divides records rather than copying the full set. Four sample events do not justify it. A managed cloud deployment would also need authentication, encryption, restricted access and tested backups. Replication does not replace backups or protect PostgreSQL automatically. This is a proposed design: no replica set, sharding or failover experiment was implemented.</p>
+<h2>Evidence</h2>
+<p>Scripts, explanations and screenshots: <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/tree/main/portfolio-1-database-design">P1 design and tests</a>, <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/tree/main/portfolio-2-query-optimisation">P2 plans and timings</a>, <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/tree/main/portfolio-3-transactions-concurrency">P3 transactions</a>, <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/tree/main/portfolio-4-nosql">P4 events</a>, <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/tree/main/portfolio-5-distributed-cloud">P5 proposal</a>. Earlier screenshots record earlier database states; Portfolio 3 changes the original loans.</p>
+<h2>Individual reflection</h2>
+<p>Example only. Replace this paragraph with your own design choice, difficulty, action and lesson.</p>
+<p>Separating books from copies makes the lending rule easier to express. The two-session example shows a less obvious problem: a copy can appear available while another session has an uncommitted loan. Checking the waiting session and the final duplicate-key error explains why the unique index matters. The query comparison also shows that the same correct result can involve different amounts of work. Testing other date ranges and index maintenance costs would make the performance analysis more useful.</p>
+<h2>References</h2>
+<p>[1] PostgreSQL Global Development Group. PostgreSQL 16: Constraints. <a href="https://www.postgresql.org/docs/16/ddl-constraints.html">https://www.postgresql.org/docs/16/ddl-constraints.html</a></p>
+<p>[2] PostgreSQL Global Development Group. PostgreSQL 16: Using EXPLAIN. <a href="https://www.postgresql.org/docs/16/using-explain.html">https://www.postgresql.org/docs/16/using-explain.html</a></p>
+<p>[3] PostgreSQL Global Development Group. PostgreSQL 16: Transaction Isolation. <a href="https://www.postgresql.org/docs/16/transaction-iso.html">https://www.postgresql.org/docs/16/transaction-iso.html</a></p>
+<p>[4] MongoDB. Data Modeling in MongoDB. <a href="https://www.mongodb.com/docs/manual/data-modeling/">https://www.mongodb.com/docs/manual/data-modeling/</a></p>
+<p>[5] MongoDB. Replication. <a href="https://www.mongodb.com/docs/manual/replication/">https://www.mongodb.com/docs/manual/replication/</a></p>
+<p>Accessed 17 October 2026. Additional topic-specific references appear in the portfolio READMEs. The lending data is fictional; the benchmark records are generated by the saved SQL.</p>
+<h2>AI-use declaration</h2>
+<p>Sample only: use this if AI guided you and you executed the work yourself.</p>
+<p>“I used [AI tool name] to explain database concepts and help review the structure and wording of my portfolio. I executed the database commands myself, checked the results against the assessment requirements and corrected issues before submission. I understand the work and remain responsible for its accuracy.”</p>
+<p>Replace the tool name. Include any help with scripts, analysis or execution if used. Only claim checks you personally completed.</p>
+</article><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="01_Create_Your_Repository.html">Start the codelab →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

@@ -1,0 +1,122 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 14 Save or undo a transaction | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a aria-current="page" href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 14 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="13_Compare_Plans_And_Add_Index.html">← Previous</a><a href="15_Test_Two_Database_Sessions.html">Next step →</a></nav><article><h1>Step 14 Save or undo a transaction</h1>
+<p>Portfolio 3 is worth <strong>7 marks</strong>. Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> asks for commit, rollback, isolation, and a concurrency issue or control mechanism, with outputs or screenshots.</p>
+<p>This step covers <strong>commit and rollback</strong>. Step 15 covers two sessions working at the same time. Use <strong>three screenshots altogether</strong> for Portfolio 3.</p>
+<p>A transaction groups database changes:</p>
+<ul>
+<li><code>BEGIN</code> starts the group.</li>
+<li><code>COMMIT</code> saves its changes.</li>
+<li><code>ROLLBACK</code> undoes its unsaved changes.</li>
+</ul>
+<h2>1. Check where you are starting</h2>
+<p>Use the PostgreSQL terminal connected to <strong>the database you created in Step 8</strong>, as in Step 12. The library example uses <code>library_portfolio</code>; yours may have a different name.</p>
+<p>The SQL below is for the library example. For another case study, use the prompt at the end of this step to get SQL for your own tables.</p>
+<p>For the library, run:</p>
+<pre><code class="language-sql">SELECT c.barcode, l.returned_at::date AS return_date
+FROM public.loan l JOIN public.book_copy c USING (copy_id)
+ORDER BY c.barcode, l.borrowed_at;</code></pre><p>Expected from Portfolio 1:</p>
+<table>
+<thead>
+<tr>
+<th>barcode</th>
+<th>return_date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LIB001</td>
+<td>2026-10-07</td>
+</tr>
+<tr>
+<td>LIB001</td>
+<td>empty</td>
+</tr>
+<tr>
+<td>LIB002</td>
+<td>empty</td>
+</tr>
+</tbody></table>
+<p>An empty return date means the copy has not been returned. LIB003 has no loan yet. If your starting records differ, check where you stopped before continuing. <strong>Run this exercise once; do not recreate your tables.</strong></p>
+<p>Maximise the terminal panel and press <strong>Ctrl+L</strong> to clear old output from view.</p>
+<h2>2. Save a book return with COMMIT</h2>
+<p>Run each statement in order:</p>
+<pre><code class="language-sql">BEGIN;
+
+-- Record the return only if this loan has not already been returned.
+UPDATE public.loan
+SET returned_at = TIMESTAMPTZ '2026-10-17 12:00:00+00'
+WHERE copy_id = (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB002')
+  AND returned_at IS NULL;
+
+COMMIT;</code></pre><p>Expected: <code>BEGIN</code>, <code>UPDATE 1</code>, then <code>COMMIT</code>. One loan now has a saved return date.</p>
+<p>Try recording that return again, using a different date:</p>
+<pre><code class="language-sql">UPDATE public.loan
+SET returned_at = TIMESTAMPTZ '2026-10-18 12:00:00+00'
+WHERE copy_id = (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB002')
+  AND returned_at IS NULL;</code></pre><p>Expected: <strong><code>UPDATE 0</code></strong>. The <code>returned_at IS NULL</code> condition prevents this command from overwriting an existing return. It is part of this return workflow; other unrestricted UPDATE commands could still change the date.</p>
+<h2>3. Undo changes after an error</h2>
+<p>Start a new transaction and add a loan for LIB003:</p>
+<pre><code class="language-sql">BEGIN;
+
+INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at)
+SELECT m.member_id, c.copy_id,
+       TIMESTAMPTZ '2026-10-17 13:00:00+00', TIMESTAMPTZ '2026-10-24 13:00:00+00'
+FROM public.member m CROSS JOIN public.book_copy c
+WHERE m.membership_number = 'M001' AND c.barcode = 'LIB003';</code></pre><p>Expected: <code>BEGIN</code>, then <strong><code>INSERT 0 1</code></strong>, meaning one row was added inside this transaction. It has not been committed.</p>
+<p>Now deliberately give that loan an invalid due date:</p>
+<pre><code class="language-sql">UPDATE public.loan SET due_at = borrowed_at
+WHERE copy_id = (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB003')
+  AND returned_at IS NULL;</code></pre><p>Expected: an error naming <strong><code>loan_due_after_borrowing</code></strong>. The due date must be later than borrowing, not equal to it.</p>
+<p>Run this next:</p>
+<pre><code class="language-sql">ROLLBACK;</code></pre><p>Expected: <code>ROLLBACK</code>. This undoes the whole second transaction, including the valid loan added before the error. It does not undo the earlier committed return.</p>
+<p>Check both results:</p>
+<pre><code class="language-sql">SELECT returned_at::date AS saved_return FROM public.loan
+WHERE copy_id = (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB002');
+
+SELECT count(*) AS lib003_loans FROM public.loan
+WHERE copy_id = (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB003');</code></pre><p>Expected: <strong>2026-10-17</strong> for the saved return and <strong>0</strong> loans for LIB003. Failed inserts can leave gaps in generated IDs; do not renumber them.</p>
+<p>Take <strong>one screenshot</strong> showing the commit, repeated-return result, rollback error and final checks. Name it <code>Surname_Firstname_StudentID_P3_CommitRollback.png</code>, using your own details. Keep <code>.jpg</code> if that is your image format.</p>
+<ul>
+<li>Mac: <strong>Cmd+Shift+4</strong>. Windows: <strong>Win+Shift+S</strong>, then save the image.</li>
+<li>Create a <code>screenshots</code> folder inside <code>portfolio-3-transactions-concurrency</code> in Codespaces Explorer.</li>
+<li>Rename your image, then right-click that folder → <strong>Upload…</strong> and select it.</li>
+</ul>
+<p><img src="images/46_Commit_And_Rollback.jpg" alt="Library commit and rollback results"></p>
+<h2>4. Save the SQL</h2>
+<p>Create <code>Surname_Firstname_StudentID_P3_Transactions.sql</code> inside <code>portfolio-3-transactions-concurrency</code>. Save the SQL you ran in order, with short comments. Do not copy terminal prompts or error output into the SQL file.</p>
+<p>The complete library example is <a href="Harrison_Perete_202600001_P3_Transactions.sql">P3_Transactions.sql</a>.</p>
+<h2>Prompt for your own case study</h2>
+<p>Attach the files named below from your repository. You do not need to remember which records changed: the AI should first give you queries to check them. Run those queries and paste their results back into the same chat.</p>
+<pre><code class="language-text">Create a simple commit and rollback exercise for MIT 8103 Portfolio 3.
+
+MY CASE AND CURRENT DATABASE
+[ATTACH MY PORTFOLIO 1 README, SCHEMA.SQL AND SAMPLE-DATA SQL FILES.
+ENTER THE DATABASE NAME I CREATED IN STEP 8.]
+
+First give me one or two simple SELECT queries to check the records
+needed for this exercise. Wait for me to run them and paste the results.
+Use those results to choose suitable records; do not assume the sample
+data is unchanged. Then provide the exercise below.
+
+Follow this structure, using my actual tables and rules:
+1. A starting-data check with the expected rows.
+2. BEGIN, one meaningful update, and COMMIT. Use a condition that
+   prevents repeating the operation when appropriate; show a repeat check.
+3. BEGIN, one valid change, then a deliberate violation of an existing
+   constraint. Show the expected constraint error and ROLLBACK.
+4. Queries proving that the committed change remains and the valid
+   change from the rolled-back transaction is gone.
+
+Give each SQL block, its expected result, and one simple sentence of
+explanation. Use existing identifiers and fixed valid dates where relevant.
+Do not delete records, disable constraints or introduce new features.
+Explain that setup matters and the exercise runs once. Request missing
+inputs rather than inventing identifiers. Results are predictions until run.
+Use one screenshot for this exercise. Do not add the two-session test yet.</code></pre><h2>Save to GitHub</h2>
+<p>Save your file. In the other terminal with the <code>$</code> prompt, run each line separately:</p>
+<pre><code class="language-bash">git diff --check
+git add portfolio-3-transactions-concurrency/
+git diff --cached --stat
+git commit -m &quot;Demonstrate commit and rollback&quot;
+git push origin main</code></pre><p>Check the staged filenames before committing. These tests change the live library data; earlier Portfolio 1 and 2 screenshots remain records of those earlier runs.</p>
+<p><strong>Next: <a href="15_Test_Two_Database_Sessions.html">Step 15 — Test two sessions borrowing the same copy</a>.</strong></p>
+<p><a href="13_Compare_Plans_And_Add_Index.html">Back to Step 13</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="13_Compare_Plans_And_Add_Index.html">← Previous</a><a href="15_Test_Two_Database_Sessions.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

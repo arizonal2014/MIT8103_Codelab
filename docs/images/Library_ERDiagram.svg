@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="480" height="250" preserveAspectRatio="xMinYMin meet" viewBox="0 0 480 250" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="480" height="250"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-250)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="0" y="167" width="200" height="83" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<rect x="0" y="227" width="200" height="23" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(90%,94%,95%); fill-rule: evenodd;"/>
+			<text x="9" y="234" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,468) scale(1,-1)">member</text>
+			<text x="9" y="213" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,426) scale(1,-1)">member_id  PK</text>
+			<text x="9" y="198" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,396) scale(1,-1)">membership_number  UK</text>
+			<text x="9" y="183" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,366) scale(1,-1)">full_name</text>
+			<text x="9" y="168" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,336) scale(1,-1)">email  UK</text>
+			<rect x="280" y="182" width="200" height="68" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<rect x="280" y="227" width="200" height="23" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(90%,94%,95%); fill-rule: evenodd;"/>
+			<text x="289" y="234" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,468) scale(1,-1)">book</text>
+			<text x="289" y="213" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,426) scale(1,-1)">book_id  PK</text>
+			<text x="289" y="198" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,396) scale(1,-1)">isbn  UK</text>
+			<text x="289" y="183" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,366) scale(1,-1)">title</text>
+			<rect x="0" y="0" width="200" height="113" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<rect x="0" y="90" width="200" height="23" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(90%,94%,95%); fill-rule: evenodd;"/>
+			<text x="9" y="97" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,194) scale(1,-1)">loan</text>
+			<text x="9" y="76" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,152) scale(1,-1)">loan_id  PK</text>
+			<text x="9" y="61" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,122) scale(1,-1)">member_id  FK</text>
+			<text x="9" y="46" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,92) scale(1,-1)">copy_id  FK</text>
+			<text x="9" y="31" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,62) scale(1,-1)">borrowed_at</text>
+			<text x="9" y="16" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,32) scale(1,-1)">due_at</text>
+			<text x="9" y="1" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,2) scale(1,-1)">returned_at (optional)</text>
+			<rect x="280" y="35" width="200" height="68" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(100%,100%,100%); fill-rule: evenodd;"/>
+			<rect x="280" y="80" width="200" height="23" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.7; fill: rgb(90%,94%,95%); fill-rule: evenodd;"/>
+			<text x="289" y="87" style="font-family: Helvetica-Bold; font-size: 10px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,174) scale(1,-1)">book_copy</text>
+			<text x="289" y="66" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,132) scale(1,-1)">copy_id  PK</text>
+			<text x="289" y="51" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,102) scale(1,-1)">book_id  FK</text>
+			<text x="289" y="36" style="font-family: Helvetica; font-size: 9px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,72) scale(1,-1)">barcode  UK</text>
+			<path d="M 100,167 L 100,113 Z" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.9;"/>
+			<path d="M 380,182 L 380,103 Z" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.9;"/>
+			<path d="M 200,70 L 280,70 Z" style="stroke: rgb(20%,25%,33%); stroke-linecap: butt; stroke-width: 0.9;"/>
+			<text x="107" y="157" style="font-family: Helvetica; font-size: 8.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,314) scale(1,-1)">1</text>
+			<text x="107" y="119" style="font-family: Helvetica; font-size: 8.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,238) scale(1,-1)">0..many</text>
+			<text x="387" y="169" style="font-family: Helvetica; font-size: 8.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,338) scale(1,-1)">1</text>
+			<text x="387" y="111" style="font-family: Helvetica; font-size: 8.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,222) scale(1,-1)">0..many</text>
+			<text x="207" y="78" style="font-family: Helvetica; font-size: 8.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,156) scale(1,-1)">0..many</text>
+			<text x="267" y="78" style="font-family: Helvetica; font-size: 8.5px;fill: rgb(0%,0%,0%); stroke:none;" transform="translate(0,156) scale(1,-1)">1</text>
+		</g>
+	</g>
+</svg>

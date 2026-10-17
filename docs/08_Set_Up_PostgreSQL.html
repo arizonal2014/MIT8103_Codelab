@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 8 Set up PostgreSQL | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a aria-current="page" href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 8 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="07_Normalisation.html">← Previous</a><a href="09_Create_And_Check_Tables.html">Next step →</a></nav><article><h1>Step 8 Set up PostgreSQL</h1>
+<p>Portfolio 1 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires tables, keys and constraints. This step sets up PostgreSQL and creates an empty database to hold your tables.</p>
+<p>Run these commands in the <strong>Codespaces terminal</strong>, not your computer&#39;s terminal.</p>
+<p>In Codespaces, open <strong>Terminal → New Terminal</strong> from the main menu if you cannot see the terminal panel. Click inside the terminal before typing.</p>
+<p>Copy one command, press <strong>Enter</strong>, then wait for it to finish. Do not copy the surrounding backticks or type the prompt symbols such as <code>$</code> or <code>postgres=#</code>.</p>
+<p>Already using PostgreSQL elsewhere? Connect to a new practice database there and continue to the table-creation step. The Ubuntu setup commands below are only for Codespaces.</p>
+<h2>1. Install PostgreSQL</h2>
+<p>The terminal initially shows a line ending in <code>$</code>. This is where the installation commands go. After each command finishes, a new <code>$</code> line appears, ready for the next command.</p>
+<pre><code class="language-bash">sudo apt-get update</code></pre><p>This refreshes the list of available software. Wait for it to finish.</p>
+<pre><code class="language-bash">sudo apt-get install -y postgresql</code></pre><p>This installs PostgreSQL. It may take a few minutes. <a href="https://www.postgresql.org/download/linux/ubuntu/">PostgreSQL&#39;s Ubuntu installation guide</a>.</p>
+<p>If installation says <code>policy-rc.d denied execution of start</code>, continue to Step 2. Codespaces can block automatic startup during installation; the next command starts PostgreSQL explicitly.</p>
+<h2>2. Start the database server</h2>
+<p>PostgreSQL must be running before you can use it. Enter:</p>
+<pre><code class="language-bash">sudo service postgresql start</code></pre><h2>3. Open PostgreSQL</h2>
+<pre><code class="language-bash">sudo runuser -u postgres -- psql</code></pre><p>If you see <code>postgres=#</code>, PostgreSQL is running and the connection worked. This is where you type SQL commands, such as <code>CREATE DATABASE</code>.</p>
+<p>The command opens PostgreSQL using its local administrator account, called <code>postgres</code>. This connection does not need a database password. It is for this practice workspace.</p>
+<h2>4. Create your practice database</h2>
+<p>A database is a named space that holds your tables. The library example uses <code>library_portfolio</code>.</p>
+<p><strong>For your own case study, ask your AI:</strong></p>
+<pre><code class="language-text">My MIT 8103 case study is: [INSERT YOUR CASE STUDY NAME].
+Choose one short PostgreSQL database name for it.
+Use only lowercase letters and underscores, ending in _portfolio.
+Start with a letter. Do not include spaces, my name or my student ID.
+Return the name, followed by these two commands using that exact name:
+1. CREATE DATABASE the_name;
+2. \c the_name
+Do not add other commands or sample output.</code></pre><p>For example, a clinic case study could use <code>clinic_portfolio</code>. Keep your chosen name for the later steps.</p>
+<p>At <code>postgres=#</code>, enter the first command from the AI response. For the library example, it is:</p>
+<pre><code class="language-sql">CREATE DATABASE library_portfolio;</code></pre><p>Keep the semicolon at the end. PostgreSQL uses it to know the SQL command is complete.</p>
+<p>Expected result: <code>CREATE DATABASE</code>. If it says the database already exists, do not create it again; continue with the connection command below.</p>
+<p>Now enter the second command, replacing the name if yours is different:</p>
+<pre><code class="language-text">\c library_portfolio</code></pre><p><code>\c</code> means connect to that database. The prompt changes to <code>library_portfolio=#</code>, or your chosen name followed by <code>=#</code>.</p>
+<p>Check the connection:</p>
+<pre><code class="language-sql">SELECT current_database(), current_user;</code></pre><p>The result should show your chosen database name and the user <code>postgres</code>.</p>
+<p>Here is the result for the library example. Your database name may be different.</p>
+<p><img src="images/14_PostgreSQL_Connection.jpg" alt="Successful connection to the library database"></p>
+<p>Keep this PostgreSQL session open. The next step creates your tables here.</p>
+<h2>5. Save evidence</h2>
+<p>Take a screenshot of the connection-check query and its result. It should show your database name and the user <code>postgres</code>. Begin the screenshot filename with your required name and student ID, for example <code>Harrison_Perete_202600001_P1_DatabaseConnection.png</code>.</p>
+<p>In Codespaces Explorer, right-click <code>portfolio-1-database-design</code> → <strong>New Folder…</strong> and name it <code>screenshots</code>. Right-click that new folder → <strong>Upload…</strong> and select your picture. Keep the SQL and design files in the parent Portfolio 1 folder.</p>
+<p>Keep the same Codespace for the practical work. GitHub saves your project files, not the running database. Rebuilding or deleting the Codespace can remove the installed server or database; save scripts and back up data first.</p>
+<p>When returning after the Codespace has stopped, use these commands at the terminal&#39;s <code>$</code> prompt:</p>
+<pre><code class="language-bash">sudo service postgresql start
+sudo runuser -u postgres -- psql</code></pre><p>Then enter <code>\c library_portfolio</code> inside PostgreSQL, using your own database name. There is no need to repeat <code>CREATE DATABASE</code>.</p>
+<p><strong>Next: <a href="09_Create_And_Check_Tables.html">Step 9 — Create and check the tables</a>.</strong></p>
+<p><a href="07_Normalisation.html">Back to Step 7</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="07_Normalisation.html">← Previous</a><a href="09_Create_And_Check_Tables.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

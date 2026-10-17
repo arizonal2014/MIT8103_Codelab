@@ -1,0 +1,88 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 1 Create your assessment repository | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a aria-current="page" href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 1 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="02_Open_Codespaces.html">Next step →</a></nav><article><h1>Step 1 Create your assessment repository</h1>
+<h2>What the assessment asks for</h2>
+<p>Section 5, <strong>GitHub Repository Requirements</strong>, of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> asks you to create a private GitHub repository. It should contain your scripts, database models, outputs, screenshots and documentation, added progressively as you work. Section 6 requires the assessor to have access before submission.</p>
+<p>We will create the repository first so you have somewhere to save each portfolio activity.</p>
+<h2>Your names and folder structure</h2>
+<p>The LMS submission instructions require the submission folder to use <code>Surname_Firstname_StudentID</code>, and uploaded files to use <code>Surname_Firstname_StudentID_DocumentType</code>.</p>
+<p>For this demonstration, we will use:</p>
+<table>
+<thead>
+<tr>
+<th>Detail</th>
+<th>Demonstration value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>First name</td>
+<td>Perete</td>
+</tr>
+<tr>
+<td>Surname</td>
+<td>Harrison</td>
+</tr>
+<tr>
+<td>Student ID</td>
+<td>202600001 — dummy ID for this tutorial</td>
+</tr>
+<tr>
+<td>Submission folder</td>
+<td>Harrison_Perete_202600001</td>
+</tr>
+<tr>
+<td>Repository name</td>
+<td>Harrison_Perete_202600001</td>
+</tr>
+<tr>
+<td>Example filename</td>
+<td>Harrison_Perete_202600001_README.md</td>
+</tr>
+</tbody></table>
+<p><strong>Replace the demonstration name and ID with your own.</strong> Using the submission folder name for the repository keeps the naming consistent; the brief does not prescribe that exact repository name. Your GitHub username can be different.</p>
+<p>Section 5 suggests organising the five portfolios into separate directories. We will build this structure as we continue:</p>
+<pre><code class="language-text">Harrison_Perete_202600001/
+├── Harrison_Perete_202600001_README.md
+├── portfolio-1-database-design/
+├── portfolio-2-query-optimisation/
+├── portfolio-3-transactions-concurrency/
+├── portfolio-4-nosql/
+└── portfolio-5-distributed-cloud/</code></pre><p>You do not need to create these files or folders yet.</p>
+<h2>Create a GitHub account or sign in</h2>
+<p>GitHub stores your project files and records changes to them. A repository is the project space where you keep those files.</p>
+<p>If you do not have an account:</p>
+<ol>
+<li>Open <a href="https://github.com/signup">GitHub sign-up</a>.</li>
+<li>Follow the registration prompts and choose a username.</li>
+<li>Complete the requested account and email verification.</li>
+<li>Sign in to GitHub.</li>
+</ol>
+<p>If you already have an account, <a href="https://github.com/login">sign in</a> and continue below.</p>
+<p><strong>What you should see:</strong> your signed-in GitHub dashboard, with your account menu in the upper-right corner. You should no longer be on the sign-up page.</p>
+<h2>Create an empty repository</h2>
+<ol>
+<li>Open <a href="https://github.com/new">Create a new repository</a>.</li>
+<li>Under <strong>Owner</strong>, select your own account.</li>
+<li>Enter your repository name using your own details. Our demonstration uses <code>Harrison_Perete_202600001</code>.</li>
+<li>Optionally enter the description: <code>MIT 8103 Advanced Database Systems practical portfolio</code>.</li>
+<li>Select <strong>Private</strong> for your assessment repository, as required by Section 5 (make it public as per require instructed). The instructor&#39;s teaching repository will be <strong>Public</strong> so everyone can follow the demonstration.</li>
+<li>Leave <strong>Start with a template</strong> set to <strong>No template</strong>, <strong>Add README</strong> set to <strong>Off</strong>, <strong>Add .gitignore</strong> set to <strong>No .gitignore</strong>, and <strong>Add license</strong> set to <strong>No license</strong>.</li>
+<li>Click <strong>Create repository</strong>.</li>
+</ol>
+<p>The demonstration settings below show the name, owner and Public visibility before clicking Create repository. Select your own account as Owner; <code>arizonal2014</code> is the instructor&#39;s GitHub username.</p>
+<p><img src="images/01_Repository_Settings.jpg" alt="Repository creation form with the demonstration name and Public visibility"></p>
+<p><strong>What you should see:</strong> your new repository page, with its owner and repository name at the top and a <strong>Quick setup</strong> section. It is empty because you have not added any files yet.</p>
+<p><img src="images/02_Empty_Repository.jpg" alt="New public demonstration repository showing the empty Quick setup page"></p>
+<p>You can view the <a href="https://github.com/arizonal2014/Harrison_Perete_202600001">demonstration repository</a>. It will gain files as we continue; the screenshot above records how it looked immediately after creation.</p>
+<h2>Check before continuing</h2>
+<ul>
+<li>The repository belongs to your GitHub account.</li>
+<li>Its name uses your own surname, first name and student ID.</li>
+<li>Its visibility is Private for your assessment, or Public for the instructor&#39;s demonstration.</li>
+<li>The repository is empty and shows Quick setup.</li>
+</ul>
+<p>Keep the repository page open. Continue to <a href="02_Open_Codespaces.html">Step 2 — Open your workspace in GitHub Codespaces</a>.</p>
+<h2>GitHub help</h2>
+<ul>
+<li><a href="https://docs.github.com/en/enterprise-cloud@latest/account-and-profile/how-tos/account-management/creating-an-account-on-github">Creating a GitHub account</a></li>
+<li><a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-new-repository">Creating a repository</a></li>
+</ul>
+</article><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="02_Open_Codespaces.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

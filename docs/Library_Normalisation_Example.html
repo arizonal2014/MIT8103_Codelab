@@ -1,0 +1,234 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Library Borrowing System Normalisation | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Contents · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="01_Create_Your_Repository.html">Start the codelab →</a></nav><article><h1>Library Borrowing System Normalisation</h1>
+<p>Normalisation separates information into related tables to reduce repeated details and avoid inconsistent updates. The same three loans are used below. Only the fields needed to explain the changes are shown; the full design keeps the other fields from the design document.</p>
+<p>Dates are shortened for readability. borrowed_at represents the full borrowing date and time. Names and emails are fictional.</p>
+<h2>Starting borrowing list</h2>
+<table>
+<thead>
+<tr>
+<th>member_id</th>
+<th>full_name</th>
+<th>email</th>
+<th>Borrowed copies</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Ada James</td>
+<td><a href="mailto:ada@example.com">ada@example.com</a></td>
+<td>Copy 10: book 5, Things Fall Apart, borrowed 2026-10-01, due 2026-10-08; Copy 11: book 5, Things Fall Apart, borrowed 2026-10-01, due 2026-10-08</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Ben Cole</td>
+<td><a href="mailto:ben@example.com">ben@example.com</a></td>
+<td>Copy 10: book 5, Things Fall Apart, borrowed 2026-10-15, due 2026-10-22</td>
+</tr>
+</tbody></table>
+<p>The first row contains two borrowings in one cell. Finding one loan or recording its return is awkward. Copy 10&#39;s first loan ends before its second borrowing.</p>
+<h2>1NF: One value per cell</h2>
+<p>Each borrowing has its own row. The repeated list is removed.</p>
+<table>
+<thead>
+<tr>
+<th>copy_id</th>
+<th>borrowed_at</th>
+<th>member_id</th>
+<th>full_name</th>
+<th>email</th>
+<th>book_id</th>
+<th>title</th>
+<th>due_at</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>2026-10-01</td>
+<td>1</td>
+<td>Ada James</td>
+<td><a href="mailto:ada@example.com">ada@example.com</a></td>
+<td>5</td>
+<td>Things Fall Apart</td>
+<td>2026-10-08</td>
+</tr>
+<tr>
+<td>11</td>
+<td>2026-10-01</td>
+<td>1</td>
+<td>Ada James</td>
+<td><a href="mailto:ada@example.com">ada@example.com</a></td>
+<td>5</td>
+<td>Things Fall Apart</td>
+<td>2026-10-08</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2026-10-15</td>
+<td>2</td>
+<td>Ben Cole</td>
+<td><a href="mailto:ben@example.com">ben@example.com</a></td>
+<td>5</td>
+<td>Things Fall Apart</td>
+<td>2026-10-22</td>
+</tr>
+</tbody></table>
+<p>For this example, the key is <strong>(copy_id, borrowed_at)</strong>. Both values together identify one borrowing, assuming a copy cannot be borrowed twice at the exact same instant. copy_id alone is not enough: copy 10 appears twice.</p>
+<p>The rows are in 1NF, but the book title is repeated. Correcting its spelling requires changing every related row.</p>
+<h2>2NF: Details depend on the whole key</h2>
+<p>2NF includes 1NF. A non-key field must not depend on only part of a combined key.</p>
+<p>Here, <strong>copy_id alone determines book_id and title</strong>. Those details belong to the copy, regardless of when it is borrowed. They move into a separate table.</p>
+<h3>Copy details</h3>
+<p>Key: <strong>copy_id</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>copy_id</th>
+<th>book_id</th>
+<th>title</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>5</td>
+<td>Things Fall Apart</td>
+</tr>
+<tr>
+<td>11</td>
+<td>5</td>
+<td>Things Fall Apart</td>
+</tr>
+</tbody></table>
+<h3>Borrowing details</h3>
+<p>Key: <strong>(copy_id, borrowed_at)</strong>. copy_id links to Copy details.</p>
+<table>
+<thead>
+<tr>
+<th>copy_id</th>
+<th>borrowed_at</th>
+<th>member_id</th>
+<th>full_name</th>
+<th>email</th>
+<th>due_at</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>2026-10-01</td>
+<td>1</td>
+<td>Ada James</td>
+<td><a href="mailto:ada@example.com">ada@example.com</a></td>
+<td>2026-10-08</td>
+</tr>
+<tr>
+<td>11</td>
+<td>2026-10-01</td>
+<td>1</td>
+<td>Ada James</td>
+<td><a href="mailto:ada@example.com">ada@example.com</a></td>
+<td>2026-10-08</td>
+</tr>
+<tr>
+<td>10</td>
+<td>2026-10-15</td>
+<td>2</td>
+<td>Ben Cole</td>
+<td><a href="mailto:ben@example.com">ben@example.com</a></td>
+<td>2026-10-22</td>
+</tr>
+</tbody></table>
+<p>The book details no longer repeat for every borrowing of a copy. However, the title still repeats across copies, and Ada&#39;s email still repeats across her loans.</p>
+<h2>3NF: Keep details with the thing they describe</h2>
+<p>3NF includes 2NF. Non-key fields must not depend on another non-key field. Two remaining links explain the next split:</p>
+<ul>
+<li><strong>book_id determines title</strong>: the title describes the book, not the physical copy.</li>
+<li><strong>member_id determines full_name and email</strong>: these describe the member, not the borrowing.</li>
+</ul>
+<h3>book</h3>
+<p>Key: <strong>book_id</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>book_id</th>
+<th>title</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>5</td>
+<td>Things Fall Apart</td>
+</tr>
+</tbody></table>
+<h3>book_copy</h3>
+<p>Key: <strong>copy_id</strong>. book_id is a foreign key to book.</p>
+<table>
+<thead>
+<tr>
+<th>copy_id</th>
+<th>book_id</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>10</td>
+<td>5</td>
+</tr>
+<tr>
+<td>11</td>
+<td>5</td>
+</tr>
+</tbody></table>
+<h3>member</h3>
+<p>Key: <strong>member_id</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>member_id</th>
+<th>full_name</th>
+<th>email</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Ada James</td>
+<td><a href="mailto:ada@example.com">ada@example.com</a></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Ben Cole</td>
+<td><a href="mailto:ben@example.com">ben@example.com</a></td>
+</tr>
+</tbody></table>
+<h3>loan</h3>
+<p>The final design uses <strong>loan_id</strong> as its primary key, rather than relying on a borrowing time to identify a loan. member_id and copy_id are foreign keys. Adding an ID is a design choice, not what makes a table 3NF.</p>
+<table>
+<thead>
+<tr>
+<th>loan_id</th>
+<th>member_id</th>
+<th>copy_id</th>
+<th>borrowed_at</th>
+<th>due_at</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>100</td>
+<td>1</td>
+<td>10</td>
+<td>2026-10-01</td>
+<td>2026-10-08</td>
+</tr>
+<tr>
+<td>101</td>
+<td>1</td>
+<td>11</td>
+<td>2026-10-01</td>
+<td>2026-10-08</td>
+</tr>
+<tr>
+<td>102</td>
+<td>2</td>
+<td>10</td>
+<td>2026-10-15</td>
+<td>2026-10-22</td>
+</tr>
+</tbody></table>
+<p>Now Ada&#39;s email is stored once in member, and the book title is stored once in book. The IDs preserve the links, so the borrowing details can still be brought together when needed.</p>
+<p>These are the four tables in the ER diagram. The complete schema also includes membership_number, isbn, barcode and returned_at. Unique values, date checks and the one-open-loan rule remain necessary; normalisation does not enforce those rules by itself.</p>
+</article><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="01_Create_Your_Repository.html">Start the codelab →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

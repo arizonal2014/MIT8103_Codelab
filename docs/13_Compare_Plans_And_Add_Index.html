@@ -1,0 +1,192 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 13 Compare execution plans and add an index | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a aria-current="page" href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 13 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="12_Run_SQL_Queries.html">← Previous</a><a href="14_Commit_And_Rollback.html">Next step →</a></nav><article><h1>Step 13 Compare execution plans and add an index</h1>
+<p>This completes the execution-plan, indexing and brief performance-analysis parts of Portfolio 2 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a>.</p>
+<p>An execution plan shows how PostgreSQL finds results. An index helps it find selected rows without checking the whole table. With only three library loans, a speed comparison would tell us little. Use a separate test table with more records.</p>
+<h2>1. Add more example records for the speed test</h2>
+<p>The library currently has only three loan records. We need more records to see whether an index makes a difference. The SQL below creates <strong>100,000 made-up borrowing records automatically</strong>; you do not type them individually.</p>
+<p>They go into a new table called <code>loan_history</code>. Your original library tables stay unchanged.</p>
+<p>At <code>library_portfolio=#</code>, run each block below <strong>once</strong>, in order.</p>
+<pre><code class="language-sql">CREATE SCHEMA p2_benchmark;</code></pre><p>Expected: <code>CREATE SCHEMA</code>. This creates a named area called <code>p2_benchmark</code> for the test table, within the same database.</p>
+<p>Next, run this complete block:</p>
+<pre><code class="language-sql">-- Create 100,000 example borrowing records for the speed test.
+-- Each record has a borrowing date, due date and return date.
+CREATE TABLE p2_benchmark.loan_history AS
+SELECT g AS loan_id, m.member_id, c.copy_id,
+       TIMESTAMPTZ '2000-01-01 00:00:00+00' + g * INTERVAL '1 hour' AS borrowed_at,
+       TIMESTAMPTZ '2000-01-01 00:00:00+00' + g * INTERVAL '1 hour' + INTERVAL '7 days' AS due_at,
+       TIMESTAMPTZ '2000-01-01 00:00:00+00' + g * INTERVAL '1 hour' + INTERVAL '30 minutes' AS returned_at
+FROM generate_series(1, 100000) AS g
+CROSS JOIN public.member m CROSS JOIN public.book_copy c
+WHERE m.membership_number = 'M001' AND c.barcode = 'LIB001';</code></pre><p>Expected: <code>SELECT 100000</code>. This means PostgreSQL created the table with <strong>100,000 rows</strong>.</p>
+<p>Here is how the first two made-up records are dated:</p>
+<table>
+<thead>
+<tr>
+<th>Record</th>
+<th>Borrowed</th>
+<th>Returned</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>January 1, 2000 at 01:00</td>
+<td>January 1, 2000 at 01:30</td>
+</tr>
+<tr>
+<td>2</td>
+<td>January 1, 2000 at 02:00</td>
+<td>January 1, 2000 at 02:30</td>
+</tr>
+</tbody></table>
+<p>The pattern continues until there are 100,000 records. All use Ada&#39;s member ID and copy LIB001. These are test records, not real borrowing activity.</p>
+<p>The main parts of the SQL mean:</p>
+<ul>
+<li><code>generate_series(1, 100000)</code> produces the numbers 1 to 100,000. <code>g</code> is the number for each row.</li>
+<li><code>g * INTERVAL &#39;1 hour&#39;</code> moves each borrowing time forward by another hour.</li>
+<li><code>INTERVAL &#39;7 days&#39;</code> sets the due date seven days after borrowing; <code>INTERVAL &#39;30 minutes&#39;</code> sets the return time 30 minutes after borrowing.</li>
+<li>The final <code>WHERE</code> selects the existing member M001 and copy LIB001.</li>
+</ul>
+<p>This test table does not copy the keys or constraints from Portfolio 1. It is only used to compare query speed.</p>
+<p>Now check how many rows were created:</p>
+<pre><code class="language-sql">ANALYZE p2_benchmark.loan_history;
+SELECT count(*) AS test_rows FROM p2_benchmark.loan_history;</code></pre><p>Expected: <code>ANALYZE</code>, then <strong>100000</strong>. <code>ANALYZE</code> helps PostgreSQL choose how to search the table; <code>count(*)</code> counts its rows. If the count differs, stop and check that M001 and LIB001 exist in your Portfolio 1 data.</p>
+<p>If a schema or table already exists, do not delete it or rerun the setup. Check where you stopped. Once the index exists, this table no longer provides an unindexed baseline; use a fresh, separately named test table if you need to repeat the whole experiment.</p>
+<h2>2. Count loans on one day</h2>
+<pre><code class="language-sql">SELECT count(*) AS loans_on_day FROM p2_benchmark.loan_history
+WHERE borrowed_at &gt;= TIMESTAMPTZ '2005-01-01 00:00:00+00'
+  AND borrowed_at &lt; TIMESTAMPTZ '2005-01-02 00:00:00+00';</code></pre><p>Expected: <strong>24</strong>. The date range includes the start of January 1 and excludes the start of January 2.</p>
+<h2>3. Measure before adding the index</h2>
+<pre><code class="language-sql">EXPLAIN (ANALYZE, BUFFERS)
+SELECT count(*) AS loans_on_day FROM p2_benchmark.loan_history
+WHERE borrowed_at &gt;= TIMESTAMPTZ '2005-01-01 00:00:00+00'
+  AND borrowed_at &lt; TIMESTAMPTZ '2005-01-02 00:00:00+00';</code></pre><p>This runs the query and shows its plan, execution time and buffer use. Buffers are blocks of database data accessed during execution. <code>cost</code> is an estimate, <strong>not milliseconds</strong>.</p>
+<ol>
+<li>Run it once as a warm-up; ignore that time.</li>
+<li>Press <strong>Ctrl+L</strong> to clear the display.</li>
+<li>Run the same statement three more times. Write down each <strong>Execution Time</strong> in milliseconds.</li>
+</ol>
+<p>Expected plan: <code>Seq Scan on loan_history</code>. It checks all 100,000 rows, keeps 24 and removes 99,976. The top <code>Aggregate</code> counts the matching rows and returns one count value.</p>
+<p>Take <strong>one screenshot</strong> showing the three measured plans. Name it <code>Surname_Firstname_StudentID_P2_BeforeIndex.png</code> and upload it to your Portfolio 2 <code>screenshots</code> folder, as in Step 12. Keep the actual image extension if different.</p>
+<p><img src="images/44_Query_Plan_Before_Index.jpg" alt="Library execution plans before the index"></p>
+<h2>4. Add the index and measure again</h2>
+<pre><code class="language-sql">CREATE INDEX loan_history_borrowed_at_idx
+    ON p2_benchmark.loan_history (borrowed_at);</code></pre><p>Expected: <code>CREATE INDEX</code>. This indexes the column used in the date filter.</p>
+<p>Run the <strong>same EXPLAIN statement from Section 3</strong>, again with one warm-up followed by three measured runs. Do not change the query, rows or PostgreSQL settings.</p>
+<p>Expected: an index-based scan naming <code>loan_history_borrowed_at_idx</code>, often <code>Index Only Scan</code>. Your exact plan and times can differ. Do not force a plan or claim a speed improvement your results do not show.</p>
+<p>Take <strong>one screenshot</strong> of the three measured plans. Name it <code>Surname_Firstname_StudentID_P2_AfterIndex.png</code> and upload it to the same folder.</p>
+<p><img src="images/45_Query_Plan_After_Index.jpg" alt="Library execution plans after the index"></p>
+<p>Run the count query from Section 2 again. It should still return <strong>24</strong>.</p>
+<h2>5. Save your SQL and results</h2>
+<p>Create <code>Surname_Firstname_StudentID_P2_Optimisation.sql</code> in <code>portfolio-2-query-optimisation</code>. Save the setup, count query, before-plan command, index command and after-plan command <strong>in that order</strong>. Add comments explaining the warm-up and three repeated measurements. The complete library script is <a href="Harrison_Perete_202600001_P2_Optimisation.sql">P2_Optimisation.sql</a>.</p>
+<p>Now open your <strong>existing Portfolio 2 README</strong>, created in Step 3. Replace its empty contents with these headings and your own results:</p>
+<pre><code class="language-markdown"># Portfolio 2 Query Processing and Optimisation
+
+## Queries and results
+[State what the three queries find and what they returned.]
+
+## Index comparison
+[Name the test table, row count, unchanged query and added index.]
+
+| Measurement | Before index | After index |
+| --- | --- | --- |
+| Scan type | [actual plan] | [actual plan] |
+| Three execution times (ms) | [your three values] | [your three values] |
+| Median time (ms) | [middle value] | [middle value] |
+| Shared buffer hits, third run | [actual value] | [actual value] |
+
+## Performance analysis
+[Explain the plan change and measured result in one short paragraph.
+Include a limitation and the storage/write cost of adding an index.]
+
+## Files
+[Link your Queries.sql, Optimisation.sql and screenshots/ folder.]
+
+## Reference
+[Link documentation you used.]</code></pre><p>The <strong>median</strong> is the middle value after sorting your three times from smallest to largest. Do not copy the library timings into a different run.</p>
+<h3>Library results</h3>
+<p>The <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-2-query-optimisation/Harrison_Perete_202600001_P2_README.md">completed library README</a> uses the headings above, with these observed results:</p>
+<p>The three queries return two open loans, one available copy (LIB003), and loan totals of two for Ada and one for Ben. The performance test counts 24 loans on January 1, 2005 from 100,000 generated records.</p>
+<table>
+<thead>
+<tr>
+<th>Measurement</th>
+<th>Before index</th>
+<th>After index</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Scan type</td>
+<td>Seq Scan</td>
+<td>Index Only Scan</td>
+</tr>
+<tr>
+<td>Three execution times (ms)</td>
+<td>7.941, 5.534, 14.668</td>
+<td>0.039, 0.040, 0.030</td>
+</tr>
+<tr>
+<td>Median time (ms)</td>
+<td>7.941</td>
+<td>0.039</td>
+</tr>
+<tr>
+<td>Shared buffer hits, third run</td>
+<td>960</td>
+<td>3</td>
+</tr>
+</tbody></table>
+<p>The index reduces the work needed for this narrow date range. Before indexing, PostgreSQL checks all 100,000 rows; afterwards, the index scan finds 24 matching entries. The measured median falls from 7.941 ms to 0.039 ms. Both measured phases use cached data, and Codespaces timing varies, so this is not a production benchmark. The index also uses storage and adds maintenance work when rows change.</p>
+<p>Reference: <a href="https://www.postgresql.org/docs/16/using-explain.html">PostgreSQL — Using EXPLAIN</a>.</p>
+<h2>Prompts for your own case study</h2>
+<p>Use the first prompt <strong>before</strong> running your performance experiment:</p>
+<pre><code class="language-text">Help me demonstrate indexing for MIT 8103 Portfolio 2 using my own case.
+
+MY CASE, ACTUAL SCHEMA AND SAMPLE DATA
+[ATTACH MY AGREED CASE DESCRIPTION, SCHEMA AND SAMPLE-DATA FILES]
+
+Use a separate p2_benchmark schema and one clearly labelled synthetic
+history table so my Portfolio 1 records stay unchanged. Provide SQL to
+generate 100,000 plausible rows using my existing identifiers, refresh
+statistics with ANALYZE, and check the total count.
+
+Choose one useful, selective date-range or identifier query. Provide
+its expected result derived from the generated data, EXPLAIN (ANALYZE,
+BUFFERS) before indexing, one suitable B-tree index, and the identical
+EXPLAIN query afterwards. Avoid indexes already present on the test table.
+Do not delete tables, change planner settings or invent measured timings.
+Explain each block in one simple sentence. State that setup runs once,
+and each plan runs once for warm-up then three times for measurement.
+If essential inputs are missing, ask for them rather than guessing names.</code></pre><p>Use this second prompt <strong>after</strong> you have run the commands:</p>
+<pre><code class="language-text">Draft my Portfolio 2 README from the work and observed results below.
+
+MY FILES AND OBSERVED OUTPUT
+[ATTACH MY QUERIES AND OPTIMISATION SQL. PASTE ACTUAL QUERY RESULTS,
+BEFORE/AFTER PLANS AND THREE MEASURED TIMES FOR EACH PHASE.
+LIST MY EXACT FILENAMES AND SAVED SCREENSHOTS.]
+
+Use exactly these headings:
+# Portfolio 2 Query Processing and Optimisation
+## Queries and results
+## Index comparison
+## Performance analysis
+## Files
+## Reference
+
+Keep it short, like the library example. Summarise the three query results.
+Include a before/after table with scan type, three execution times,
+median time and top-level shared buffer hits from the third measured run.
+Explain the observed plan and performance in one paragraph, including
+timing limitations and index storage/write overhead. Use actual relative
+file links and supplied references. Do not invent results or claim that
+an index guarantees faster queries. Ask for missing evidence first.</code></pre><h2>6. Save to GitHub</h2>
+<p>Save the edited files with <strong>Cmd+S</strong> or <strong>Ctrl+S</strong>. In the <code>$</code> terminal, run each line separately:</p>
+<pre><code class="language-bash">git diff --check
+git diff
+git add portfolio-2-query-optimisation/
+git diff --cached --stat
+git commit -m &quot;Add index comparison and Portfolio 2 analysis&quot;
+git push origin main
+git status</code></pre><p>Press <strong>q</strong> to leave a scrolling diff. Review the staged file list before committing. On GitHub, check your README, SQL links and three screenshots.</p>
+<p><strong>Portfolio 2 evidence:</strong> SQL queries and results (Step 12), execution plans and index (Step 13), and the short README comparison.</p>
+<p><strong>Next: <a href="14_Commit_And_Rollback.html">Step 14 — Save or undo a transaction</a>.</strong></p>
+<p><a href="12_Run_SQL_Queries.html">Back to Step 12</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="12_Run_SQL_Queries.html">← Previous</a><a href="14_Commit_And_Rollback.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

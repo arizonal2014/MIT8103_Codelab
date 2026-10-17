@@ -1,0 +1,128 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 11 Update the README and save Portfolio 1 | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a aria-current="page" href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 11 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="10_Insert_And_Test_Data.html">← Previous</a><a href="12_Run_SQL_Queries.html">Next step →</a></nav><article><h1>Step 11 Update the README and save Portfolio 1</h1>
+<p>Portfolio 1 is worth <strong>7 marks</strong>. Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> asks for the six items below. Check yours before starting Portfolio 2.</p>
+<h2>1. Update your existing Portfolio 1 README</h2>
+<p>In Step 4, you wrote the case study, users, operations, business rules and scope. Now add a short account of what you created and tested. Section 8 of the brief asks the README to explain implementation and testing.</p>
+<ol>
+<li>In Codespaces Explorer, open <code>portfolio-1-database-design</code>.</li>
+<li>Open <strong>your</strong> <code>Surname_Firstname_StudentID_P1_README.md</code>. This is not the README at the top of the repository.</li>
+<li>Keep your existing description. Below <code>## Scope</code>, add the three sections shown below: <strong>Design and implementation files</strong>, <strong>Implementation</strong> and <strong>Test results</strong>.</li>
+<li>If those sections already exist, update them instead of adding them twice.</li>
+</ol>
+<p>Do not rerun the SQL.</p>
+<h3>Library example: sections to add</h3>
+<p>This example uses the library results from Steps 8–10. For a different case study, use the prompt below rather than copying the library results.</p>
+<pre><code class="language-markdown">## Design and implementation files
+
+| File | Contents |
+| --- | --- |
+| [Design](Harrison_Perete_202600001_P1_Design.md) | Entities, attributes, keys and relationships. |
+| [ER diagram](Harrison_Perete_202600001_P1_ERDiagram.md) | The four tables and their relationships. |
+| [Normalisation](Harrison_Perete_202600001_P1_Normalisation.md) | Example tables showing 1NF, 2NF and 3NF. |
+| [Schema](Harrison_Perete_202600001_P1_Schema.sql) | Table definitions, keys and constraints. |
+| [Sample records](Harrison_Perete_202600001_P1_SampleData.sql) | Fictional members, a book, copies and loans. |
+| [Constraint tests](Harrison_Perete_202600001_P1_ConstraintTests.sql) | Invalid inserts and the final count query. |
+| [Screenshots](screenshots/) | Saved commands and results. |
+
+## Implementation
+
+The database runs on PostgreSQL in GitHub Codespaces. Its name is library_portfolio. It contains member, book, book_copy and loan. Each table has a primary key. Foreign keys connect copies to books and loans to members and copies.
+
+Membership numbers, emails, ISBNs and barcodes are unique. Date checks reject invalid loan dates. A unique partial index prevents two open loans for the same copy. The schema and sample records were committed before the invalid inserts were tested separately.
+
+## Test results
+
+Six invalid inserts were rejected: a missing name, repeated email, nonexistent book link, invalid due date, invalid return date and a second open loan for LIB001.
+
+The final counts are 2 members, 1 book, 3 copies and 3 loans. The failed inserts added no rows. One loan is returned and two remain open.
+
+The return-once workflow is not enforced by the table definitions alone. It needs transaction logic and testing in Portfolio 3.
+
+Reference: [PostgreSQL constraints](https://www.postgresql.org/docs/16/ddl-constraints.html).</code></pre><p>In <code>[Design](filename.md)</code>, replace <code>filename.md</code> with your exact filename. Keep <code>screenshots/</code> if that is your folder name. No separate evidence index is needed.</p>
+<h3>Prompt for your own case study</h3>
+<p>Use this after completing Step 10. Supply your existing README, SQL files, filenames and actual results. Replace each bracketed instruction before sending the prompt.</p>
+<pre><code class="language-text">Help me update my existing MIT 8103 Portfolio 1 README after testing.
+Follow the library example's three-section structure, not its library facts.
+
+EXISTING README
+[PASTE MY CURRENT PORTFOLIO 1 README]
+
+FILES
+[PASTE THE EXACT FILENAMES IN MY PORTFOLIO 1 FOLDER]
+
+IMPLEMENTATION
+[ATTACH MY SCHEMA, SAMPLE-DATA AND CONSTRAINT-TEST SQL FILES.
+STATE MY DATABASE NAME AND WHERE POSTGRESQL RUNS.]
+
+OBSERVED RESULTS
+[PASTE THE OUTPUTS FROM MY TESTS AND FINAL ROW-COUNT QUERY.
+STATE WHICH SCREENSHOTS I SAVED IN THE screenshots FOLDER.]
+
+Return only these sections as Markdown to add below my existing Scope:
+## Design and implementation files
+## Implementation
+## Test results
+
+- First section: a two-column table, File and Contents. Link my existing
+  design, ER diagram, normalisation, schema, sample-data and test files
+  using their exact relative filenames. Link screenshots/ directly.
+- Implementation: at most two short paragraphs describing my actual
+  setup, tables, keys, constraints and how I ran the supplied tests.
+- Test results: at most three short paragraphs describing the observed
+  rejected or accepted records, final counts and any untested rules.
+- Add a reference only for documentation actually used and supplied.
+- Keep the language simple and suitable for an individual assessment.
+- Do not rewrite my original case study, users, operations, rules or scope.
+- Do not copy library names, counts or results unless they are mine.
+- Do not invent files, screenshots, successful tests or execution steps.
+- If essential input is missing or the results contradict the SQL, first
+  list what needs checking and stop. Do not produce a completion claim.
+- If these headings already exist, return replacement sections, not
+  another copy of them. Do not add a new title or further sections.</code></pre><p>Check the response against your terminal output before pasting it. A rejected insert must fail for the intended rule. If results are missing or unexpected, return to Step 10.</p>
+<p>Save the file with <strong>Cmd+S</strong> on Mac or <strong>Ctrl+S</strong> on Windows.</p>
+<h2>2. Check the required work</h2>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>What to check in your Portfolio 1 folder</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Case study description</td>
+<td>The README names the system, its users, the information stored and the main operations.</td>
+</tr>
+<tr>
+<td>ER diagram</td>
+<td>The diagram opens on GitHub. Its tables, fields and relationships match the design.</td>
+</tr>
+<tr>
+<td>Relational schema</td>
+<td>The Schema.sql file creates the agreed tables.</td>
+</tr>
+<tr>
+<td>Keys</td>
+<td>Each table has a primary key. Foreign keys connect the correct tables.</td>
+</tr>
+<tr>
+<td>Constraints</td>
+<td>Required fields, unique values and other rules match the design. Screenshots show the definitions and tests.</td>
+</tr>
+<tr>
+<td>Normalisation explanation</td>
+<td>Actual example tables show 1NF, 2NF and 3NF. The final tables match the schema.</td>
+</tr>
+</tbody></table>
+<p>Also check that your screenshots are readable and use your filename prefix.</p>
+<h2>3. Save to GitHub</h2>
+<p>In the terminal with the <code>$</code> prompt, run each line separately. If you see <code>library_portfolio=#</code> instead, you are in PostgreSQL: use the other terminal for these Git commands.</p>
+<pre><code class="language-bash">git diff --check
+git diff
+git add portfolio-1-database-design/
+git diff --cached --stat
+git commit -m &quot;Review Portfolio 1 documentation and evidence&quot;
+git push origin main
+git status</code></pre><p>Review <code>git diff</code>; press <strong>q</strong> to leave a scrolling view. Check the staged file list before committing. If there is nothing to commit, skip the commit command and continue with push and status.</p>
+<p>Open your Portfolio 1 README on GitHub. Check that the new sections appear and every link opens. If a link fails, correct its filename or path in Codespaces, then save, commit and push again.</p>
+<p><strong>Next: <a href="12_Run_SQL_Queries.html">Step 12 — Run useful SQL queries</a>.</strong></p>
+<p><a href="10_Insert_And_Test_Data.html">Back to Step 10</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="10_Insert_And_Test_Data.html">← Previous</a><a href="12_Run_SQL_Queries.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

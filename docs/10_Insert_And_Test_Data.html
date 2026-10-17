@@ -1,0 +1,167 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 10 Add sample records and test the rules | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a aria-current="page" href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 10 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="09_Create_And_Check_Tables.html">← Previous</a><a href="11_Update_README_And_Save_Portfolio_1.html">Next step →</a></nav><article><h1>Step 10 Add sample records and test the rules</h1>
+<p>Portfolio 1 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires keys and constraints. This step demonstrates that valid records are accepted and invalid records are rejected.</p>
+<p>Use the PostgreSQL session from Step 9. Replace the filename prefix <code>Harrison_Perete_202600001</code> with your own <strong>Surname_Firstname_StudentID</strong>. Keep the picture&#39;s actual extension, <code>.png</code> or <code>.jpg</code>.</p>
+<p>Keep all pictures in the <code>screenshots</code> subfolder created in Step 8. SQL files stay directly inside <code>portfolio-1-database-design</code>.</p>
+<h2>1. Prepare the sample records</h2>
+<p>The library example contains two members, one book, three physical copies and three loans. One loan is returned and two are open. All personal details are fictional.</p>
+<p>Save <a href="Harrison_Perete_202600001_P1_SampleData.sql">the sample SQL</a> and <a href="Harrison_Perete_202600001_P1_ConstraintTests.sql">the test SQL</a> inside <code>portfolio-1-database-design</code>, using your own name and ID in the filenames.</p>
+<p>For your own case study, use this prompt:</p>
+<pre><code class="language-text">I am completing MIT 8103 Portfolio 1. Use my existing PostgreSQL schema
+to create a small set of fictional records and test its constraints.
+
+MY SCHEMA AND BUSINESS RULES
+[PASTE YOUR SQL FROM STEP 9 AND YOUR BUSINESS RULES]
+
+Return two clearly labelled SQL files:
+1. SampleData.sql: a small valid dataset, wrapped in BEGIN and COMMIT.
+2. ConstraintTests.sql: separate deliberately invalid INSERT statements.
+
+Keep the existing schema unchanged. Insert parent records before records
+that reference them. Look up generated IDs using unique values rather
+than guessing ID numbers. Use fictional names and example.com emails.
+Include valid examples relevant to my system's different record states.
+Test one rule per invalid statement: required fields, unique values,
+foreign keys and each CHECK or conditional uniqueness rule in my schema.
+Use otherwise valid values so a different rule does not cause the error.
+State the expected error in a short comment above each test.
+Run negative tests separately, outside a transaction block, so one error
+does not stop the next test. End with a query counting the rows in each
+table and state the expected counts after all invalid inserts fail.
+Use short, beginner-friendly comments. No DROP, DELETE or TRUNCATE.
+Do not claim these statements have already run.</code></pre><h2>2. Check the tables before inserting</h2>
+<pre><code class="language-sql">SELECT 'member' AS table_name, count(*) AS row_count FROM public.member
+UNION ALL SELECT 'book', count(*) FROM public.book
+UNION ALL SELECT 'book_copy', count(*) FROM public.book_copy
+UNION ALL SELECT 'loan', count(*) FROM public.loan;</code></pre><p>For the first run, all four counts should be <strong>0</strong>. If records already exist, stop and check them rather than inserting the same sample twice.</p>
+<h2>3. Insert the library records</h2>
+<p>Run each block separately. For another case study, run the matching statements from your own sample SQL file.</p>
+<pre><code class="language-sql">BEGIN;</code></pre><p>Expected result: <code>BEGIN</code>.</p>
+<h3>Add the members</h3>
+<pre><code class="language-sql">INSERT INTO public.member (membership_number, full_name, email)
+VALUES ('M001', 'Ada James', 'ada@example.com'),
+       ('M002', 'Ben Cole', 'ben@example.com');</code></pre><p>Expected result: <code>INSERT 0 2</code>. The last number means two rows were added.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_InsertMembers.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><img src="images/27_Insert_Members.jpg" alt="Library member insert"></p>
+<h3>Add the book</h3>
+<pre><code class="language-sql">INSERT INTO public.book (isbn, title)
+VALUES ('9780385474542', 'Things Fall Apart');</code></pre><p>Expected result: <code>INSERT 0 1</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_InsertBook.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code> using <strong>Upload…</strong> in the folder&#39;s right-click menu.</p>
+<p><img src="images/28_Insert_Book.jpg" alt="Library book insert"></p>
+<h3>Add three copies</h3>
+<p>The small <code>SELECT</code> inside each row finds the book&#39;s ID using its ISBN. This avoids guessing an automatically generated ID.</p>
+<pre><code class="language-sql">INSERT INTO public.book_copy (book_id, barcode)
+VALUES ((SELECT book_id FROM public.book WHERE isbn = '9780385474542'), 'LIB001'),
+       ((SELECT book_id FROM public.book WHERE isbn = '9780385474542'), 'LIB002'),
+       ((SELECT book_id FROM public.book WHERE isbn = '9780385474542'), 'LIB003');</code></pre><p>Expected result: <code>INSERT 0 3</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_InsertCopies.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/29_Insert_Copies.jpg" alt="Library copy inserts"></p>
+<h3>Add a returned loan</h3>
+<pre><code class="language-sql">INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at, returned_at)
+VALUES (
+    (SELECT member_id FROM public.member WHERE membership_number = 'M001'),
+    (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB001'),
+    '2026-10-01 09:00+00', '2026-10-08 09:00+00', '2026-10-07 10:00+00'
+);</code></pre><p>Expected result: <code>INSERT 0 1</code>. Ada borrowed LIB001 and returned it before Ben&#39;s later loan.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_InsertReturnedLoan.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/30_Insert_ReturnedLoan.jpg" alt="Returned library loan insert"></p>
+<h3>Add two open loans</h3>
+<pre><code class="language-sql">INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at)
+VALUES (
+    (SELECT member_id FROM public.member WHERE membership_number = 'M002'),
+    (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB001'),
+    '2026-10-15 09:00+00', '2026-10-22 09:00+00'
+), (
+    (SELECT member_id FROM public.member WHERE membership_number = 'M001'),
+    (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB002'),
+    '2026-10-01 09:00+00', '2026-10-08 09:00+00'
+);</code></pre><p>Expected result: <code>INSERT 0 2</code>. returned_at is not supplied, so both loans have no return date. LIB003 remains available.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_InsertOpenLoans.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/31_Insert_OpenLoans.jpg" alt="Open library loan inserts"></p>
+<pre><code class="language-sql">COMMIT;</code></pre><p>Expected result: <code>COMMIT</code>. The sample records are saved. If an earlier insert fails, use <code>ROLLBACK;</code>, correct the script and restart the sample inserts instead of committing.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_SampleDataCommit.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/32_SampleData_Commit.jpg" alt="Library sample data committed"></p>
+<h2>4. Test records that should be rejected</h2>
+<p>Run the following statements <strong>one at a time</strong>, without adding <code>BEGIN</code>. Each <code>ERROR</code> below is expected: the database is rejecting an invalid record. A rejected statement adds no row, and the next test can run normally.</p>
+<h3>A missing required name</h3>
+<pre><code class="language-sql">INSERT INTO public.member (membership_number, full_name, email)
+VALUES ('TEST_NULL', NULL, 'missing@example.com');</code></pre><p>Expected result: an error saying that <code>full_name</code> violates a <strong>not-null constraint</strong>.</p>
+<p>Take a screenshot of the command and error: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TestRequiredName.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/33_Test_RequiredName.jpg" alt="Missing member name rejected"></p>
+<h3>A repeated email</h3>
+<pre><code class="language-sql">INSERT INTO public.member (membership_number, full_name, email)
+VALUES ('TEST_EMAIL', 'Test Member', 'ada@example.com');</code></pre><p>Expected result: a duplicate-key error naming <strong>member_email_key</strong>. Ada&#39;s email already belongs to a member.</p>
+<p>Take a screenshot of the command and error: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TestUniqueEmail.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/34_Test_UniqueEmail.jpg" alt="Repeated email rejected"></p>
+<h3>A copy linked to a missing book</h3>
+<pre><code class="language-sql">INSERT INTO public.book_copy (book_id, barcode)
+VALUES (-1, 'TEST_BAD_BOOK');</code></pre><p>Expected result: a foreign-key error naming <strong>book_copy_book_fk</strong>. Book -1 does not exist in this practice database.</p>
+<p>Take a screenshot of the command and error: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TestForeignKey.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/35_Test_ForeignKey.jpg" alt="Missing book link rejected"></p>
+<h3>A due date before borrowing</h3>
+<pre><code class="language-sql">INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at)
+VALUES (
+    (SELECT member_id FROM public.member WHERE membership_number = 'M001'),
+    (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB003'),
+    '2026-10-20 09:00+00', '2026-10-19 09:00+00'
+);</code></pre><p>Expected result: a check-constraint error naming <strong>loan_due_after_borrowing</strong>.</p>
+<p>Take a screenshot of the command and error: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TestDueDate.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/36_Test_DueDate.jpg" alt="Invalid due date rejected"></p>
+<h3>A return before borrowing</h3>
+<pre><code class="language-sql">INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at, returned_at)
+VALUES (
+    (SELECT member_id FROM public.member WHERE membership_number = 'M001'),
+    (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB003'),
+    '2026-10-20 09:00+00', '2026-10-27 09:00+00', '2026-10-19 09:00+00'
+);</code></pre><p>Expected result: a check-constraint error naming <strong>loan_return_not_before_borrowing</strong>.</p>
+<p>Take a screenshot of the command and error: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TestReturnDate.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/37_Test_ReturnDate.jpg" alt="Invalid return date rejected"></p>
+<h3>A second open loan for the same copy</h3>
+<pre><code class="language-sql">INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at)
+VALUES (
+    (SELECT member_id FROM public.member WHERE membership_number = 'M001'),
+    (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB001'),
+    '2026-10-17 09:00+00', '2026-10-24 09:00+00'
+);</code></pre><p>Expected result: a duplicate-key error naming <strong>loan_one_open_copy</strong>. Ben already has an open loan for LIB001.</p>
+<p>Take a screenshot of the command and error: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TestOpenLoan.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/38_Test_OpenLoan.jpg" alt="Second open loan rejected"></p>
+<p>If a test succeeds instead of failing, stop and investigate before continuing. Check the error&#39;s rule name too: an error from a different rule does not prove the intended rule works.</p>
+<h2>5. Check that the valid records remain</h2>
+<p>Run the count query from Section 2 again. Expected counts:</p>
+<table>
+<thead>
+<tr>
+<th>table_name</th>
+<th align="right">row_count</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>member</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>book</td>
+<td align="right">1</td>
+</tr>
+<tr>
+<td>book_copy</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>loan</td>
+<td align="right">3</td>
+</tr>
+</tbody></table>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_RecordCounts.png</code>. Upload it into <code>portfolio-1-database-design/screenshots</code>.</p>
+<p><img src="images/39_Record_Counts.jpg" alt="Library record counts after the tests"></p>
+<p>The failed inserts should not add records. Automatically generated IDs may have gaps after failed inserts; that does not mean rows are missing.</p>
+<h2>6. Save your progress</h2>
+<p>In the separate terminal with the <code>$</code> prompt:</p>
+<pre><code class="language-bash">git diff --check
+git add portfolio-1-database-design/
+git diff --cached --stat
+git commit -m &quot;Add sample data and constraint tests&quot;
+git push origin main</code></pre><p>Check that your SQL files and screenshots appear on GitHub. These tests cover the listed constraints, not every possible input or the return-once transaction workflow.</p>
+<p>Library files: <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-1-database-design/Harrison_Perete_202600001_P1_SampleData.sql">sample records</a> and <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-1-database-design/Harrison_Perete_202600001_P1_ConstraintTests.sql">constraint tests</a>.</p>
+<p><strong>Next: <a href="11_Update_README_And_Save_Portfolio_1.html">Step 11 — Update the README and save Portfolio 1</a>.</strong></p>
+<p><a href="09_Create_And_Check_Tables.html">Back to Step 9</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="09_Create_And_Check_Tables.html">← Previous</a><a href="11_Update_README_And_Save_Portfolio_1.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

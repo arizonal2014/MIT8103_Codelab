@@ -1,0 +1,224 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 17 Store and query library events in MongoDB | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a aria-current="page" href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 17 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="16_Set_Up_MongoDB.html">← Previous</a><a href="18_Explain_Distributed_And_Cloud_Databases.html">Next step →</a></nav><article><h1>Step 17 Store and query library events in MongoDB</h1>
+<p>Portfolio 4 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires a NoSQL model for the same case study, implementation evidence and an explanation of suitability.</p>
+<p>Use your MongoDB connection from Step 16—<strong>local MongoDB or Atlas</strong>. The commands below work with either. They go in <strong>mongosh</strong>, not PostgreSQL or the <code>$</code> terminal.</p>
+<p>The library example is below. For another case study, use the adaptable prompt at the end <strong>before running the library commands</strong>.</p>
+<h2>1. Choose what a document stores</h2>
+<p>Store one library event per document: a copy being borrowed or returned.</p>
+<ul>
+<li><strong>Database:</strong> a named space for the work, here <code>library_events</code>.</li>
+<li><strong>Collection:</strong> a group of documents, here <code>borrowing_events</code>—similar to a table.</li>
+<li><strong>Document:</strong> one record, such as Ada returning LIB002.</li>
+<li><strong>Field:</strong> one named piece of information, such as <code>event_type</code>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Library example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>_id</code></td>
+<td>A unique event ID, such as E002. This is not a loan ID.</td>
+</tr>
+<tr>
+<td><code>event_type</code></td>
+<td>borrowed or returned</td>
+</tr>
+<tr>
+<td><code>occurred_at</code></td>
+<td>When the event happened</td>
+</tr>
+<tr>
+<td><code>member</code></td>
+<td>The member number and name, grouped together</td>
+</tr>
+<tr>
+<td><code>copy</code></td>
+<td>The barcode and book title, grouped together</td>
+</tr>
+<tr>
+<td><code>details</code></td>
+<td>Due date for a borrowing; condition for a return</td>
+</tr>
+</tbody></table>
+<p><code>member</code>, <code>copy</code> and <code>details</code> contain smaller documents inside the event. This is called <strong>embedding</strong>. Borrowing and return events share the main fields, but their <code>details</code> differ.</p>
+<p>These are fictional example events using the same library members and copies. Entering them in MongoDB does not change PostgreSQL or create an automatic connection between the two databases.</p>
+<h2>2. Select your MongoDB database</h2>
+<p>In mongosh, run:</p>
+<pre><code class="language-javascript">db = db.getSiblingDB(&quot;library_events&quot;)</code></pre><p>Expected: <code>library_events</code>, with a prompt such as <code>library_events&gt;</code>. For another case study, use your chosen MongoDB database name. It does not need to match your PostgreSQL database name.</p>
+<p>Check that the collection is empty:</p>
+<pre><code class="language-javascript">db.borrowing_events.countDocuments()</code></pre><p>Expected before inserting: <strong>0</strong>. If it is not zero, stop and check whether you already ran this exercise. Do not delete existing documents to force the expected result.</p>
+<h2>3. Insert four example documents</h2>
+<p>Copy this <strong>complete block</strong> and run it once:</p>
+<pre><code class="language-javascript">db.borrowing_events.insertMany([
+  {
+    _id: &quot;E001&quot;, event_type: &quot;borrowed&quot;,
+    occurred_at: ISODate(&quot;2026-10-01T09:00:00Z&quot;),
+    member: { membership_number: &quot;M001&quot;, full_name: &quot;Ada James&quot; },
+    copy: { barcode: &quot;LIB002&quot;, title: &quot;Things Fall Apart&quot; },
+    details: { due_at: ISODate(&quot;2026-10-08T09:00:00Z&quot;) }
+  },
+  {
+    _id: &quot;E002&quot;, event_type: &quot;returned&quot;,
+    occurred_at: ISODate(&quot;2026-10-17T12:00:00Z&quot;),
+    member: { membership_number: &quot;M001&quot;, full_name: &quot;Ada James&quot; },
+    copy: { barcode: &quot;LIB002&quot;, title: &quot;Things Fall Apart&quot; },
+    details: { condition: &quot;good&quot; }
+  },
+  {
+    _id: &quot;E003&quot;, event_type: &quot;borrowed&quot;,
+    occurred_at: ISODate(&quot;2026-10-17T14:00:00Z&quot;),
+    member: { membership_number: &quot;M002&quot;, full_name: &quot;Ben Cole&quot; },
+    copy: { barcode: &quot;LIB003&quot;, title: &quot;Things Fall Apart&quot; },
+    details: { due_at: ISODate(&quot;2026-10-24T14:00:00Z&quot;) }
+  },
+  {
+    _id: &quot;E004&quot;, event_type: &quot;borrowed&quot;,
+    occurred_at: ISODate(&quot;2026-10-15T09:00:00Z&quot;),
+    member: { membership_number: &quot;M002&quot;, full_name: &quot;Ben Cole&quot; },
+    copy: { barcode: &quot;LIB001&quot;, title: &quot;Things Fall Apart&quot; },
+    details: { due_at: ISODate(&quot;2026-10-22T09:00:00Z&quot;) }
+  }
+])</code></pre><p>Expected: <strong><code>acknowledged: true</code></strong>, with IDs <strong>E001, E002, E003 and E004</strong>. MongoDB creates the database and collection when these documents are first saved. <code>ISODate</code> stores a date value; <code>Z</code> means UTC.</p>
+<p>If you get a duplicate-key error, check for an earlier run rather than changing the IDs and inserting again.</p>
+<h2>4. Run three queries</h2>
+<p>Maximise the terminal and press <strong>Ctrl+L</strong> so the following results fit in one screenshot. Run each query separately.</p>
+<h3>Count the documents</h3>
+<pre><code class="language-javascript">db.borrowing_events.countDocuments()</code></pre><p>Expected: <strong>4</strong>.</p>
+<h3>Read a copy&#39;s event history</h3>
+<pre><code class="language-javascript">db.borrowing_events.find(
+  { &quot;copy.barcode&quot;: &quot;LIB002&quot; },
+  { _id: 1, event_type: 1, occurred_at: 1, details: 1 }
+).sort({ occurred_at: 1, _id: 1 }).toArray()</code></pre><p><code>copy.barcode</code> means the barcode inside <code>copy</code>. The second group selects fields to display; <code>1</code> means include. <code>sort</code> puts the events in date order, and <code>toArray()</code> displays the results together.</p>
+<p>Expected:</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Event</th>
+<th>Date (UTC)</th>
+<th>Details</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>E001</td>
+<td>borrowed</td>
+<td>2026-10-01 09:00</td>
+<td>due_at: 2026-10-08 09:00</td>
+</tr>
+<tr>
+<td>E002</td>
+<td>returned</td>
+<td>2026-10-17 12:00</td>
+<td>condition: good</td>
+</tr>
+</tbody></table>
+<h3>Find returns marked good</h3>
+<pre><code class="language-javascript">db.borrowing_events.find({ &quot;details.condition&quot;: &quot;good&quot; }).toArray()</code></pre><p>Expected: <strong>one complete document, E002</strong>—Ada James returning LIB002, with <code>details: { condition: &quot;good&quot; }</code>.</p>
+<p>Take <strong>one screenshot</strong> showing the count and both query results. Name it <code>Surname_Firstname_StudentID_P4_EventsAndQueries.png</code>, using your own details. Keep <code>.jpg</code> if it was saved as JPEG.</p>
+<ul>
+<li>Mac: <strong>Cmd+Shift+4</strong>. Windows: <strong>Win+Shift+S</strong>, then save.</li>
+<li>Rename the image, then upload it to your existing <code>portfolio-4-nosql/screenshots</code> folder through Explorer → right-click the folder → <strong>Upload…</strong>.</li>
+</ul>
+<p><img src="images/50_MongoDB_Events_And_Queries.jpg" alt="Four MongoDB documents, LIB002 history and the nested-field query"></p>
+<p>Together with Step 16, that is <strong>two screenshots for Portfolio 4</strong>.</p>
+<h2>5. Save the JavaScript and README</h2>
+<p>In <code>portfolio-4-nosql</code>, create <code>Surname_Firstname_StudentID_P4_MongoDB.js</code> and save your database selection, inserts and three queries, with short comments. Use <code>.js</code>, not <code>.sql</code>: these are MongoDB shell commands.</p>
+<p>The complete <a href="Harrison_Perete_202600001_P4_MongoDB.js">library script</a> includes a check that stops if records already exist. It also uses <code>printjson(...)</code> to show results when run as a saved script. You have already inserted the documents, so do not run the whole script again in this database.</p>
+<p>Now open the <strong>existing Portfolio 4 README</strong> created in Step 3. Add the following sections using your own case, model and actual results. Keep any existing work rather than pasting duplicate headings.</p>
+<pre><code class="language-markdown"># Portfolio 4 NoSQL and Advanced Data Models
+
+## Document model
+The library_events database contains a borrowing_events collection.
+Each document records one borrowing or return event. Its fields are _id,
+event_type, occurred_at, member, copy and details. Member number/name
+and copy barcode/title are embedded in the event. Borrowing details
+contain a due date; return details contain a condition.
+
+Example return document:
+
+```javascript
+{
+  _id: &quot;E002&quot;, event_type: &quot;returned&quot;,
+  occurred_at: ISODate(&quot;2026-10-17T12:00:00Z&quot;),
+  member: { membership_number: &quot;M001&quot;, full_name: &quot;Ada James&quot; },
+  copy: { barcode: &quot;LIB002&quot;, title: &quot;Things Fall Apart&quot; },
+  details: { condition: &quot;good&quot; }
+}
+```
+
+## Implementation and results
+Four fictional documents are inserted using mongosh. The count is 4.
+The LIB002 history query returns E001 (borrowed) and E002 (returned).
+Searching details.condition for good returns E002, Ada's LIB002 return.
+The events are entered separately; PostgreSQL is not changed.
+
+## Why MongoDB fits
+An event can keep its member, copy and event-specific details together.
+Borrowing and return details can differ without requiring every event
+to have every field. A separate document per event lets the history grow
+without adding everything to one large document. The copied names and
+titles are snapshots and do not automatically track SQL changes.
+PostgreSQL still handles the lending rules. This example does not enforce
+SQL foreign keys in MongoDB or synchronise the two databases.
+
+## Files
+[Link your MongoDB.js, Setup.md and screenshots/ folder.]
+
+## References
+[Link the MongoDB documentation used below.]</code></pre><p>The data represents sample events, not a complete audit history or a query for current availability. The field structure is a design choice here; this exercise does not add a schema validator.</p>
+<p>The <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-4-nosql/Harrison_Perete_202600001_P4_README.md">completed library README</a> also includes a sample document so the model can be seen directly.</p>
+<h2>Prompt for your own case study</h2>
+<pre><code class="language-text">Help me complete MIT 8103 Portfolio 4 with MongoDB for my existing case.
+
+MY CASE AND FICTIONAL RECORDS
+[ATTACH MY PORTFOLIO 1 README, SCHEMA AND SAMPLE-DATA SQL FILES.]
+
+MY MONGODB CONNECTION
+[STATE LOCAL MONGODB OR ATLAS. DO NOT INCLUDE PASSWORDS.]
+
+MY FILE PREFIX
+[ENTER THE Surname_Firstname_StudentID PREFIX USED ON MY EXISTING FILES.]
+
+Use the library event example's size and structure, adapted to my case:
+- One database name and one collection for activity/event records.
+- Four fictional documents representing two suitable event types.
+- Shared fields for event ID, type and time; small embedded documents
+  for related details; one details section that varies by event type.
+- Use relevant identifiers from my supplied records. Explain that these
+  are separate MongoDB examples, not automatically extracted SQL data.
+- Use fixed dates and unique string _id values. Do not change PostgreSQL.
+
+Return a short field table, the four documents, and mongosh commands to
+select the database, check the collection is empty, insert once, and run
+three queries: total count, one entity's ordered event history, and one
+nested-field filter. Provide expected results derived from those documents.
+Show the four documents inside one insertMany block, not as duplicate
+standalone blocks. Use my prefix for the P4_MongoDB.js filename.
+Use the same commands for local MongoDB and Atlas after connecting.
+Include brief explanations and one screenshot checkpoint for the queries.
+Do not delete existing data or invent execution results.
+
+Keep the model small; do not add an application, login, replication or
+extra collections. If essential input is missing, ask for it first.
+After I run the commands and supply the outputs, help me write a short
+README with these headings: Document model; Implementation and results;
+Why MongoDB fits; Files; References. Include one example document.
+Start it with # Portfolio 4 NoSQL and Advanced Data Models.
+Use actual results, real relative file links, a suitability explanation
+and a limitation. Do not copy the library facts into my different case.</code></pre><p>Run the generated commands and paste their results into the same AI chat before requesting the README. Do not describe predicted results as observed results.</p>
+<h2>6. Save to GitHub</h2>
+<p>Save the files with <strong>Cmd+S</strong> or <strong>Ctrl+S</strong>. Use the separate <code>$</code> terminal for Git—not mongosh:</p>
+<pre><code class="language-bash">git diff --check
+git diff
+git add portfolio-4-nosql/
+git diff --cached --stat
+git commit -m &quot;Add MongoDB event model and query evidence&quot;
+git push origin main
+git status</code></pre><p>Press <strong>q</strong> to leave a scrolling diff. Check the staged file list before committing. On GitHub, open the README, script and two screenshots. Do not upload connection credentials or MongoDB&#39;s working-data folder.</p>
+<p>References: <a href="https://www.mongodb.com/docs/manual/data-modeling/">MongoDB data modelling</a>, <a href="https://www.mongodb.com/docs/manual/reference/method/db.collection.insertmany/">inserting documents</a> and <a href="https://www.mongodb.com/docs/manual/tutorial/query-embedded-documents/">querying nested fields</a>.</p>
+<p><strong>Portfolio 4 evidence:</strong> the document model and suitability explanation in the README, the JavaScript implementation, setup notes and two screenshots.</p>
+<p><strong>Next: <a href="18_Explain_Distributed_And_Cloud_Databases.html">Step 18 — Explain distributed and cloud databases</a>.</strong></p>
+<p><a href="16_Set_Up_MongoDB.html">Back to Step 16</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="16_Set_Up_MongoDB.html">← Previous</a><a href="18_Explain_Distributed_And_Cloud_Databases.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

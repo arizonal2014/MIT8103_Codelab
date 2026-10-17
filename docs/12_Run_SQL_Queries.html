@@ -1,0 +1,124 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 12 Run useful SQL queries | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a aria-current="page" href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 12 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="11_Update_README_And_Save_Portfolio_1.html">← Previous</a><a href="13_Compare_Plans_And_Add_Index.html">Next step →</a></nav><article><h1>Step 12 Run useful SQL queries</h1>
+<p>Portfolio 2 is worth <strong>7 marks</strong>. Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> asks for SQL queries, results, execution plans, optimisation evidence and a short performance analysis.</p>
+<p>Start with three queries using the library records from Portfolio 1. Execution plans and the index follow in Step 13. This tutorial uses <strong>three screenshots for Portfolio 2 altogether</strong>; that number is a tutorial choice, not an assessment rule.</p>
+<h2>1. Open the database</h2>
+<p>Use your existing PostgreSQL terminal. The library prompt is <code>library_portfolio=#</code>.</p>
+<p>If you closed it, run this in the Codespaces <code>$</code> terminal:</p>
+<pre><code class="language-bash">sudo service postgresql start
+sudo runuser -u postgres -- psql -d library_portfolio</code></pre><p>For another PostgreSQL setup, reconnect using your usual method. Do not recreate the tables or sample records.</p>
+<p>Run this in PostgreSQL so results do not open in a separate scrolling view:</p>
+<pre><code class="language-text">\pset pager off</code></pre><p>Maximise the terminal panel using its top-right maximise button. Press <strong>Ctrl+L</strong> to clear old output from view; this does not delete records.</p>
+<h2>2. Find copies still on loan</h2>
+<p>Run the complete statement, ending with <code>;</code>:</p>
+<pre><code class="language-sql">-- Q1: Copies that are still on loan.
+SELECT m.full_name, c.barcode, l.due_at::date AS due_date
+FROM public.loan l JOIN public.member m USING (member_id)
+JOIN public.book_copy c USING (copy_id)
+WHERE l.returned_at IS NULL ORDER BY c.barcode;</code></pre><p><code>JOIN</code> connects related tables. <code>IS NULL</code> finds loans without a return date. <code>::date</code> displays just the date.</p>
+<p>Expected result:</p>
+<table>
+<thead>
+<tr>
+<th>full_name</th>
+<th>barcode</th>
+<th>due_date</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ben Cole</td>
+<td>LIB001</td>
+<td>2026-10-22</td>
+</tr>
+<tr>
+<td>Ada James</td>
+<td>LIB002</td>
+<td>2026-10-08</td>
+</tr>
+</tbody></table>
+<h2>3. Find available copies</h2>
+<pre><code class="language-sql">-- Q2: A copy is available when it has no open loan.
+SELECT c.barcode, b.title
+FROM public.book_copy c JOIN public.book b USING (book_id)
+WHERE NOT EXISTS (
+    SELECT 1 FROM public.loan l
+    WHERE l.copy_id = c.copy_id AND l.returned_at IS NULL
+)
+ORDER BY c.barcode;</code></pre><p><code>NOT EXISTS</code> keeps a copy only when no open loan is found for it. An old, returned loan does not make a copy unavailable.</p>
+<p>Expected result:</p>
+<table>
+<thead>
+<tr>
+<th>barcode</th>
+<th>title</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>LIB003</td>
+<td>Things Fall Apart</td>
+</tr>
+</tbody></table>
+<h2>4. Count loans for each member</h2>
+<pre><code class="language-sql">-- Q3: Count all loans, including returned ones.
+SELECT m.full_name, count(l.loan_id) AS total_loans
+FROM public.member m LEFT JOIN public.loan l USING (member_id)
+GROUP BY m.member_id, m.full_name ORDER BY m.full_name;</code></pre><p><code>GROUP BY</code> gives one result per member. <code>LEFT JOIN</code> also includes members with no loans; their count would be zero.</p>
+<p>Expected result:</p>
+<table>
+<thead>
+<tr>
+<th>full_name</th>
+<th align="right">total_loans</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ada James</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>Ben Cole</td>
+<td align="right">1</td>
+</tr>
+</tbody></table>
+<p>Take <strong>one screenshot</strong> showing the three queries and their results together. If the text does not fit, save the full results as text rather than shrinking them until unreadable.</p>
+<ul>
+<li><strong>Mac:</strong> Cmd+Shift+4, then select the terminal area.</li>
+<li><strong>Windows:</strong> Win+Shift+S, select the terminal area, then save from Snipping Tool.</li>
+<li>Rename the saved image <code>Harrison_Perete_202600001_P2_QueryResults.png</code> using <strong>your own name and student ID</strong>. Keep <code>.jpg</code> instead if your image was saved as JPEG.</li>
+<li>In Codespaces Explorer, right-click <code>portfolio-2-query-optimisation</code>, choose <strong>New Folder</strong>, and name it <code>screenshots</code>.</li>
+<li>Right-click that <code>screenshots</code> folder, choose <strong>Upload…</strong>, and select your renamed image.</li>
+</ul>
+<p><img src="images/43_Library_Query_Results.jpg" alt="Three library queries and their results"></p>
+<h2>5. Save the SQL</h2>
+<p>In <code>portfolio-2-query-optimisation</code>, create <code>Harrison_Perete_202600001_P2_Queries.sql</code>, replacing the prefix with yours. Paste the three queries you ran, including their comments, and save with <strong>Cmd+S</strong> or <strong>Ctrl+S</strong>.</p>
+<p>The complete library file is <a href="Harrison_Perete_202600001_P2_Queries.sql">P2_Queries.sql</a>. Save SQL in this file, not terminal prompts or result tables.</p>
+<h2>Prompt for a different case study</h2>
+<pre><code class="language-text">Create three PostgreSQL queries for my MIT 8103 Portfolio 2.
+
+MY CASE STUDY AND RULES
+[PASTE MY AGREED CASE-STUDY DESCRIPTION]
+
+MY ACTUAL SCHEMA AND SAMPLE DATA
+[ATTACH MY PORTFOLIO 1 SCHEMA AND SAMPLE-DATA SQL FILES]
+
+Use the library example's size and structure:
+1. A useful list joining related tables and filtering records.
+2. An availability or missing-related-record check using NOT EXISTS,
+   or another simple query that fits my actual business rules.
+3. A grouped count using LEFT JOIN so zero-count records are retained.
+
+For each query provide a short heading, commented SQL, one sentence
+explaining it, and the expected result derived from my sample data.
+Use my actual table and column names, not renamed library examples.
+Use stable ordering and fixed dates where needed for repeatable results.
+Do not change data or invent results. If required files are missing,
+ask for them. Keep this to three queries; no execution plans yet.</code></pre><p>Run your queries and compare the actual results with the predictions. If they differ, check the query and data before saving your explanation.</p>
+<h2>Save to GitHub</h2>
+<p>Use the other terminal with the <code>$</code> prompt. Run each line separately:</p>
+<pre><code class="language-bash">git diff --check
+git add portfolio-2-query-optimisation/
+git diff --cached --stat
+git commit -m &quot;Add Portfolio 2 queries and results&quot;
+git push origin main</code></pre><p>Check the staged filenames before committing. Open the SQL file and screenshot on GitHub to confirm they arrived.</p>
+<p><strong>Next: <a href="13_Compare_Plans_And_Add_Index.html">Step 13 — Compare execution plans and add an index</a>.</strong></p>
+<p><a href="11_Update_README_And_Save_Portfolio_1.html">Back to Step 11</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="11_Update_README_And_Save_Portfolio_1.html">← Previous</a><a href="13_Compare_Plans_And_Add_Index.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

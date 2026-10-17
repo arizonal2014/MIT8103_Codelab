@@ -1,0 +1,132 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 19 Prepare the final 2-3-page summary | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a aria-current="page" href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 19 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="18_Explain_Distributed_And_Cloud_Databases.html">← Previous</a><a href="index.html">Back to contents</a></nav><article><h1>Step 19 Prepare the final 2-3-page summary</h1>
+<p>Final documentation is worth <strong>6 marks</strong>. Sections 4 and 6 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> ask for a <strong>2-3-page summary</strong> of all five activities, your selected case study, GitHub link and supporting evidence. Sections 8 and 11 require an individual technical reflection and acknowledgement of sources and AI assistance where used.</p>
+<p>The summary explains the work. Keep the full SQL, scripts and screenshot collections in GitHub.</p>
+<h2>1. Open the library example</h2>
+<p>Read the <a href="Harrison_Perete_202600001_FinalSummary.html">worked summary</a>, or open its <a href="output/pdf/Harrison_Perete_202600001_FinalSummary.pdf">three-page PDF</a>.</p>
+<p>It uses the results already recorded in the codelab. For example, Portfolio 2 returns <strong>24</strong> before and after indexing, while the median times change from <strong>7.941 ms</strong> to <strong>0.039 ms</strong>. Portfolio 5 describes a proposal, not an implemented replica set.</p>
+<p>Use the structure, not the library&#39;s results or reflection. Your measurements may differ.</p>
+<h2>2. Create your summary</h2>
+<p>Open Word or Google Docs and create a blank document. Start with your name, student ID, case-study title and GitHub repository link. Use these headings:</p>
+<pre><code class="language-text">Case study
+Portfolio 1: Database Design and Modelling
+Portfolio 2: Query Processing and Optimisation
+Portfolio 3: Transactions and Concurrency
+Portfolio 4: NoSQL and Advanced Data Models
+Portfolio 5: Distributed and Cloud Database Exercise
+Evidence
+Individual reflection
+References
+AI-use declaration</code></pre><p>A simple three-page layout:</p>
+<table>
+<thead>
+<tr>
+<th>Page</th>
+<th>What to include</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>Your details, case study, Portfolio 1 and a readable ER diagram</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Portfolios 2-4, including a small before/after results table</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Portfolio 5, evidence links, your reflection, references and AI declaration</td>
+</tr>
+</tbody></table>
+<p>This layout is a suggestion, not an extra assessment rule. Use readable 11-12-point text. Do not add a separate cover page. Check the exported PDF&#39;s page count, not just the word count.</p>
+<p>For each portfolio, state <strong>what you did, the main result and what it means</strong>. Example: “The second insert waited, then failed after the first session committed. The unique index prevented two open loans for LIB003.”</p>
+<p>Reuse existing evidence. Link to the correct portfolio folders or individual screenshot files; do not take new screenshots just for this step. If an LMS field specifically requests an embedded image, use a clear existing image with a short caption. Keep it readable and within the page limit.</p>
+<h2>3. Write your own reflection and declaration</h2>
+<p>Write about <strong>one design choice, one difficulty, what you did and what you learned</strong>. A short paragraph is enough. Use something you actually experienced.</p>
+<p>For example, if this happened in your run: “Session B waited, so I checked the other session and found it had not committed. After the commit, B received a duplicate-key error. This helped me understand why checking availability is not enough.” Do not use this as a personal claim if it did not happen to you.</p>
+<p>For the AI declaration, this is <strong>sample wording if AI provided guidance and you executed the work yourself</strong>. Replace the tool name and adapt the description to what really happened:</p>
+<pre><code class="language-text">I used [AI tool name] to explain database concepts and help review the
+structure and wording of my portfolio. I executed the database commands
+myself, checked the results against the assessment requirements and
+corrected issues before submission. I understand the work and remain
+responsible for its accuracy.</code></pre><p>Include assistance with scripts, analysis or execution if it was used. Do not claim that you ran or checked something unless you did. If you used no AI, state that only if true.</p>
+<p>Add your ER diagram from Portfolio 1 beneath the design section. On GitHub, open its rendered preview, take a screenshot of the diagram, then insert that image in Word or Google Docs. Crop out unrelated browser controls if needed, but keep every table and relationship readable. The library PDF includes a clean rendering of the same four-table design; no diagram code belongs in the summary.</p>
+<h2>4. Prompt for your own case study</h2>
+<p>Attach the five portfolio READMEs, your result tables or outputs, and the assessment brief. Copy your repository URL into the prompt. No passwords or connection secrets are needed.</p>
+<pre><code class="language-text">Help me prepare the MIT 8103 final portfolio summary.
+
+MY DETAILS
+Name: [MY NAME]
+Student ID: [MY STUDENT ID]
+Repository: [MY GITHUB URL]
+
+MY WORK
+[ATTACH MY FIVE PORTFOLIO READMES, RESULTS AND THE ASSESSMENT BRIEF.]
+
+MY OWN REFLECTION NOTES
+Design choice: [ONE CHOICE I MADE AND WHY]
+Difficulty: [SOMETHING I FOUND DIFFICULT]
+Action: [WHAT I DID ABOUT IT]
+Lesson: [WHAT I LEARNED]
+
+MY AI USE
+Tools: [TOOLS USED, OR NONE]
+Help received: [WHAT THEY ACTUALLY HELPED WITH]
+My verification: [WHAT I PERSONALLY REVIEWED, RAN OR CORRECTED]
+
+Use the title &quot;MIT 8103 Advanced Database Systems: Portfolio Summary&quot;
+and include my case-study name, name, student ID and repository URL.
+Use exactly these headings:
+Case study
+Portfolio 1: Database Design and Modelling
+Portfolio 2: Query Processing and Optimisation
+Portfolio 3: Transactions and Concurrency
+Portfolio 4: NoSQL and Advanced Data Models
+Portfolio 5: Distributed and Cloud Database Exercise
+Evidence
+Individual reflection
+References
+AI-use declaration
+
+Use simple language. Aim for about 900-1,100 words, including references,
+then I will check that the exported document fits 2-3 readable pages.
+This word range is guidance, not an assessment requirement.
+
+Summarise what was done, a verified result and its meaning for each
+portfolio. Include a small before/after table using my actual measured
+plans and times. Preserve the units and explain measurement limits.
+Distinguish earlier database states from later transaction changes.
+Clearly label proposed distributed designs and tests not performed.
+Link to my actual GitHub evidence; do not invent screenshot filenames.
+Use references already consulted in my portfolios, with in-text citations.
+
+Use only my reflection notes for the reflection. If they are blank,
+ask me for one short answer at a time; do not invent my experience.
+Likewise, do not invent personal verification or hide assistance in
+the AI declaration. If results are missing or inconsistent, ask for
+the relevant existing file or output before drafting that section.
+Do not copy the library example's results into my different case study.
+Return the document text only, with no teaching notes or extra sections.</code></pre><p>Compare the draft with your actual outputs. Correct mismatches before exporting. Only cite sources you used; add any external code, datasets or tutorial material that informed your work.</p>
+<h2>5. Export, name and save</h2>
+<ol>
+<li>Save the editable document as <code>Surname_Firstname_StudentID_FinalSummary.docx</code>, using your own details. In Google Docs, rename the document, then use <strong>File → Download → Microsoft Word (.docx)</strong> if you need an editable local copy.</li>
+<li>Export a PDF. Word: <strong>File → Save As/Export → PDF</strong>. Google Docs: <strong>File → Download → PDF Document (.pdf)</strong>.</li>
+<li>Name it <code>Surname_Firstname_StudentID_FinalSummary.pdf</code>. Open it and confirm it has <strong>2 or 3 pages</strong>, readable text, working links and no unfinished brackets or example identity.</li>
+<li>In Codespaces Explorer, right-click your repository&#39;s top-level folder → <strong>Upload…</strong>. Upload the PDF. You may also upload the editable copy. Neither file belongs inside the question PDF.</li>
+</ol>
+<p>For the demo, the files are <code>Harrison_Perete_202600001_FinalSummary.md</code> and <code>Harrison_Perete_202600001_FinalSummary.pdf</code>. The Markdown is an editable source; students can write directly in Word or Google Docs instead.</p>
+<p>Use the <code>$</code> terminal, replacing the filename with yours. Run each line separately:</p>
+<pre><code class="language-bash">git status
+git add Harrison_Perete_202600001_FinalSummary.pdf
+git diff --cached --stat
+git commit -m &quot;Add final portfolio summary&quot;
+git push origin main
+git status</code></pre><p>If you also uploaded an editable copy, stage its exact filename before the commit. Check that the staged files contain no credentials or unrelated documents.</p>
+<p><strong>Expected result:</strong> the summary appears at the top level of your GitHub repository, and Git reports a clean working tree after all intended files are committed. Open the PDF on GitHub to check it.</p>
+<p>If the export exceeds three pages, remove repeated details and long SQL blocks rather than shrinking the text. If a link fails, copy its actual GitHub URL and export again.</p>
+<h2>6. Before submission</h2>
+<p>Confirm the summary covers all five activities, your reflection and sources, and that the assessor can access the repository. Section 5 specifies a <strong>private student repository</strong>; give the assessor access as instructed. The public library repository is a demonstration, not a change to that requirement.</p>
+<p>Follow the current LMS/form instructions for the required upload format. Submit your own final document, not this worked example. The supplied submission instructions allow <strong>one attempt</strong>, so review the actual upload before submitting.</p>
+<h2>What you built</h2>
+<p>You now have five related database activities, their practical evidence and a short document that directs the assessor to the work. The final task is to review your own files and submit through the stated LMS/form route.</p>
+<p><a href="18_Explain_Distributed_And_Cloud_Databases.html">Back to Step 18</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="18_Explain_Distributed_And_Cloud_Databases.html">← Previous</a><a href="index.html">Back to contents</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

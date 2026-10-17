@@ -1,0 +1,54 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 7 Explain normalisation | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a aria-current="page" href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 7 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="06_Create_ER_Diagram.html">← Previous</a><a href="08_Set_Up_PostgreSQL.html">Next step →</a></nav><article><h1>Step 7 Explain normalisation</h1>
+<p>Portfolio 1 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires a <strong>normalisation explanation</strong>. Show the changes using tables, not definitions alone.</p>
+<p>Normalisation reduces repeated information. For example, a member&#39;s email belongs in the member table, rather than being copied into every loan.</p>
+<h2>1. Follow the library example</h2>
+<p>Read the <a href="Library_Normalisation_Example.html">worked library example</a>. It follows the same records through:</p>
+<ol>
+<li><strong>1NF:</strong> One borrowing per row, with one value per cell.</li>
+<li><strong>2NF:</strong> Move copy details away from the combined borrowing key.</li>
+<li><strong>3NF:</strong> Put book details in book and member details in member.</li>
+</ol>
+<p>The result matches the four tables in the ER diagram. These are example records explaining the design, not database execution results.</p>
+<p>See the <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-1-database-design/Harrison_Perete_202600001_P1_Normalisation.md">completed library answer on GitHub</a>.</p>
+<h2>2. Adapt it to your case study</h2>
+<p>Use this prompt with your Step 5 design and the worked library example:</p>
+<pre><code class="language-text">I am completing MIT 8103 Portfolio 1. Explain normalisation for my case
+study using small example tables, following the reference's simple style.
+
+MY AGREED DATABASE DESIGN AND BUSINESS RULES
+[PASTE YOUR DESIGN FROM STEP 5]
+
+REFERENCE EXAMPLE
+[PASTE THE WORKED LIBRARY NORMALISATION EXAMPLE]
+
+Start with the title: &quot;[MY CASE STUDY NAME] Normalisation&quot;.
+Show a starting record with a repeated list, then 1NF, 2NF and 3NF.
+Use the same two or three fictional example records throughout.
+At every stage, show actual tables, name the keys, and briefly explain
+what moved, why it moved, and which repeated detail or update problem
+is removed. Define any technical term in basic words.
+For 2NF, identify fields depending on only part of a combined key.
+If there is no such dependency, explain why it is already in 2NF;
+do not invent one. State any assumptions needed for example keys.
+For 3NF, show fields depending on another non-key field and separate
+them where needed. Explain how IDs keep the resulting tables linked.
+The final tables must match my agreed design. You may show selected
+fields for readability, but list any fields left out of the examples.
+Explain separately if the final design replaces an example combined
+key with an automatically generated ID. An ID alone does not prove 3NF.
+Use present tense, not &quot;I will&quot;. Return only the Markdown answer.
+Do not generate SQL or claim these example records were executed.</code></pre><h2>3. Save and commit</h2>
+<ol>
+<li>Create <code>Harrison_Perete_202600001_P1_Normalisation.md</code> inside <code>portfolio-1-database-design</code>. Replace the name and ID with yours.</li>
+<li>Paste your reviewed answer, including its title. For the library demo, use the worked example.</li>
+<li>Check that the same records appear at every stage and the final tables match your ER diagram.</li>
+<li>Run these commands separately, using your own filename:</li>
+</ol>
+<pre><code class="language-bash">git diff --check
+git add portfolio-1-database-design/Harrison_Perete_202600001_P1_Normalisation.md
+git commit -m &quot;Explain normalisation with example tables&quot;
+git push origin main</code></pre><p>Open the file on GitHub and check that the tables display correctly.</p>
+<p><img src="images/12_Normalisation_On_GitHub.jpg" alt="Library normalisation tables on GitHub"></p>
+<p><strong>Next: <a href="08_Set_Up_PostgreSQL.html">Step 8 — Set up PostgreSQL</a>.</strong></p>
+<p><a href="06_Create_ER_Diagram.html">Back to Step 6</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="06_Create_ER_Diagram.html">← Previous</a><a href="08_Set_Up_PostgreSQL.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

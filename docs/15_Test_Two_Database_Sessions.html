@@ -1,0 +1,189 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 15 Test two sessions borrowing the same copy | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a aria-current="page" href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 15 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="14_Commit_And_Rollback.html">← Previous</a><a href="16_Set_Up_MongoDB.html">Next step →</a></nav><article><h1>Step 15 Test two sessions borrowing the same copy</h1>
+<p>This covers <strong>isolation and concurrency control</strong> for Portfolio 3 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a>.</p>
+<p>Imagine two staff members trying to lend LIB003 to different members at the same time. Two database sessions let us test this without needing two computers.</p>
+<h2>1. Open two PostgreSQL sessions</h2>
+<p>Keep the PostgreSQL terminal from Step 14 open. This is <strong>Session A</strong>, on the left.</p>
+<ol>
+<li>With that terminal selected, open the command palette: <strong>Cmd+Shift+P</strong> on Mac or <strong>Ctrl+Shift+P</strong> on Windows.</li>
+<li>Type <code>Terminal: Split Terminal</code> and select that exact command. A second terminal opens beside the first.</li>
+<li>In the new <code>$</code> terminal on the right, run:</li>
+</ol>
+<pre><code class="language-bash">sudo runuser -u postgres -- psql -d library_portfolio</code></pre><p>This is <strong>Session B</strong>. Both connect to the same database. If you use PostgreSQL elsewhere, open a second independent connection to that database.</p>
+<p>For your own case study, replace <code>library_portfolio</code> in the connection command with the database name you created in Step 8. Use your own case-study SQL from the prompt below, not the library borrowing commands.</p>
+<p>To make the prompts easy to tell apart, run this <strong>in A</strong>:</p>
+<pre><code class="language-text">\set PROMPT1 'Session A%x%R%# '</code></pre><p>Run these <strong>in B</strong>:</p>
+<pre><code class="language-text">\pset pager off
+\set PROMPT1 'Session B%x%R%# '</code></pre><p>These only label the prompts and keep results visible. Press <strong>Ctrl+L</strong> in each terminal to clear old output. Hide the Explorer sidebar if you need more space.</p>
+<p><strong>Important: follow A → B → A → B below. Do not paste all the commands into one session.</strong></p>
+<h2>2. Session A: start a loan, but do not save it yet</h2>
+<p>Run in <strong>A</strong>:</p>
+<pre><code class="language-sql">SET application_name = 'p3_session_a';
+BEGIN ISOLATION LEVEL READ COMMITTED;
+SHOW transaction_isolation;
+
+INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at)
+SELECT m.member_id, c.copy_id,
+       TIMESTAMPTZ '2026-10-17 14:00:00+00', TIMESTAMPTZ '2026-10-24 14:00:00+00'
+FROM public.member m CROSS JOIN public.book_copy c
+WHERE m.membership_number = 'M002' AND c.barcode = 'LIB003';</code></pre><p>Expected: <code>read committed</code> and <strong><code>INSERT 0 1</code></strong>. Session A has added Ben&#39;s loan but has not committed it. <strong>Stop here in A.</strong></p>
+<p><code>READ COMMITTED</code> means a normal SELECT does not see another session&#39;s uncommitted changes. The application name labels the connection for the waiting check below.</p>
+<h2>3. Session B: try to borrow that same copy</h2>
+<p>Run in <strong>B</strong>:</p>
+<pre><code class="language-sql">SET application_name = 'p3_session_b';
+BEGIN ISOLATION LEVEL READ COMMITTED;
+SHOW transaction_isolation;
+
+SELECT count(*) AS visible_open_loans FROM public.loan
+WHERE copy_id = (SELECT copy_id FROM public.book_copy WHERE barcode = 'LIB003')
+  AND returned_at IS NULL;</code></pre><p>Expected: <code>read committed</code> and <strong>0</strong> visible open loans. B cannot yet see A&#39;s new loan because A has not committed.</p>
+<p>Still in <strong>B</strong>, run:</p>
+<pre><code class="language-sql">INSERT INTO public.loan (member_id, copy_id, borrowed_at, due_at)
+SELECT m.member_id, c.copy_id,
+       TIMESTAMPTZ '2026-10-17 14:00:00+00', TIMESTAMPTZ '2026-10-24 14:00:00+00'
+FROM public.member m CROSS JOIN public.book_copy c
+WHERE m.membership_number = 'M001' AND c.barcode = 'LIB003';</code></pre><p><strong>Expected: B waits.</strong> There is no new prompt or <code>INSERT 0 1</code> yet. This is not a frozen terminal: the existing <code>loan_one_open_copy</code> index detects a possible conflict and waits for A to finish. Do not enter more commands in B yet.</p>
+<h2>4. Session A: check the wait, then commit</h2>
+<p>Switch back to <strong>A</strong> and run:</p>
+<pre><code class="language-sql">SELECT application_name, wait_event_type FROM pg_stat_activity
+WHERE application_name = 'p3_session_b';</code></pre><p>Expected:</p>
+<table>
+<thead>
+<tr>
+<th>application_name</th>
+<th>wait_event_type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>p3_session_b</td>
+<td>Lock</td>
+</tr>
+</tbody></table>
+<p>Take <strong>one screenshot</strong> of both terminals, showing A&#39;s uncommitted insert, B&#39;s count of zero and the lock wait. Name it <code>Surname_Firstname_StudentID_P3_SessionsWaiting.png</code>. Upload it to your Portfolio 3 <code>screenshots</code> folder, as in Step 14.</p>
+<p><img src="images/47_Two_Sessions_Waiting.jpg" alt="Two library sessions before Session A commits"></p>
+<p>Now run <strong>in A</strong>:</p>
+<pre><code class="language-sql">COMMIT;</code></pre><p>Expected: <code>COMMIT</code>. Ben&#39;s loan is now saved.</p>
+<h2>5. Session B: check the outcome</h2>
+<p>B should now show a duplicate-key error naming <strong><code>loan_one_open_copy</code></strong>. Its attempted loan for Ada is rejected because Ben already has that copy on loan.</p>
+<p>Run <strong>in B</strong>:</p>
+<pre><code class="language-sql">ROLLBACK;
+
+SELECT m.full_name, c.barcode, count(*) AS open_loans
+FROM public.loan l JOIN public.member m USING (member_id)
+JOIN public.book_copy c USING (copy_id)
+WHERE c.barcode = 'LIB003' AND l.returned_at IS NULL
+GROUP BY m.full_name, c.barcode;</code></pre><p>Expected:</p>
+<table>
+<thead>
+<tr>
+<th>full_name</th>
+<th>barcode</th>
+<th align="right">open_loans</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Ben Cole</td>
+<td>LIB003</td>
+<td align="right">1</td>
+</tr>
+</tbody></table>
+<p>Take <strong>one screenshot</strong> of both terminals showing A&#39;s commit, B&#39;s error, rollback and final result. Name it <code>Surname_Firstname_StudentID_P3_ConcurrencyResult.png</code> and upload it to the same folder. Keep your actual image extension.</p>
+<p><img src="images/48_Concurrency_Result.jpg" alt="One open loan remains after the competing attempt is rejected"></p>
+<p><strong>What happened:</strong> B&#39;s earlier count of zero did not guarantee that the copy was available. The unique index, not the count query or isolation level alone, prevented two open loans. Both transactions are now finished; no locks are deliberately left waiting.</p>
+<p>If B does not wait, check that A has not already committed and both sessions use the same database. If you get a different error, resolve it before describing the test as successful. To abandon an interrupted test, cancel B&#39;s waiting command with <strong>Ctrl+C</strong>, then run <code>ROLLBACK;</code> in both sessions. Do not delete loans to force the expected result.</p>
+<h2>6. Save the scripts and README</h2>
+<p>In <code>portfolio-3-transactions-concurrency</code>, create these files with <strong>your own prefix</strong>:</p>
+<ul>
+<li><code>Surname_Firstname_StudentID_P3_SessionA.sql</code>: A&#39;s commands, with comments marking where to stop and switch sessions.</li>
+<li><code>Surname_Firstname_StudentID_P3_SessionB.sql</code>: B&#39;s commands, with the same stop/switch comments.</li>
+</ul>
+<p>Library examples: <a href="Harrison_Perete_202600001_P3_SessionA.sql">SessionA.sql</a> and <a href="Harrison_Perete_202600001_P3_SessionB.sql">SessionB.sql</a>. These files document the order; <strong>do not run either whole file in one go</strong>.</p>
+<p>Open your existing Portfolio 3 README from Step 3. Use the following structure, replacing the library facts with your own observed results:</p>
+<pre><code class="language-markdown"># Portfolio 3 Transactions and Concurrency
+
+## Commit and rollback
+The return for LIB002 is committed with a return date of October 17, 2026.
+A repeated return affects zero rows because the UPDATE only changes an
+open loan. In the next transaction, a valid LIB003 loan is added before
+an invalid due date causes an error. ROLLBACK removes that new loan;
+the earlier committed return remains.
+
+## Isolation and concurrency control
+Two PostgreSQL sessions use READ COMMITTED. A inserts a LIB003 loan for
+Ben without committing. B sees zero open loans, then tries to insert one
+for Ada. B waits, with wait_event_type shown as Lock. After A commits,
+B receives a loan_one_open_copy duplicate-key error. B rolls back, and
+the final query shows exactly one open LIB003 loan, belonging to Ben.
+
+## Conclusion
+COMMIT saves changes and ROLLBACK undoes a transaction's unsaved changes.
+READ COMMITTED hides other sessions' uncommitted records. The unique
+index prevents two open loans even when an earlier availability check
+finds none. The return-once check belongs to the demonstrated UPDATE
+workflow; it does not prevent every possible direct database edit.
+
+## Files
+[Link your Transactions.sql, SessionA.sql, SessionB.sql and screenshots/.]
+
+## References
+[Link the PostgreSQL documentation used below.]</code></pre><p>The SQL and screenshots support these statements. Earlier portfolio outputs describe earlier database states; the committed return and new loan now change the live records. No changes are made to Portfolio 2&#39;s separate speed-test table.</p>
+<p>See the <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-3-transactions-concurrency/Harrison_Perete_202600001_P3_README.md">completed library README</a> for the finished example with file links.</p>
+<p>References: <a href="https://www.postgresql.org/docs/16/tutorial-transactions.html">PostgreSQL transactions</a>, <a href="https://www.postgresql.org/docs/16/transaction-iso.html">transaction isolation</a>, and <a href="https://www.postgresql.org/docs/16/indexes-unique.html">unique indexes</a>.</p>
+<h2>Prompts for another case study</h2>
+<p>Before the two-session exercise:</p>
+<pre><code class="language-text">Design a simple two-session concurrency test for MIT 8103 Portfolio 3.
+
+MY ACTUAL CASE, SCHEMA AND CURRENT RECORDS
+[ATTACH MY PORTFOLIO 1 README AND SCHEMA SQL, PLUS MY TRANSACTIONS.SQL
+FROM STEP 14. PASTE THE TWO FINAL CHECK RESULTS FROM THAT EXERCISE.]
+
+If you need more information about my current records, first give me
+simple SELECT queries to run and wait for their results. Do not ask me
+to work out which records changed from memory.
+
+Follow the library example's A → B → A → B sequence using my own rules.
+Use two independent PostgreSQL connections and explicitly show the
+isolation level. Where suitable, demonstrate an existing unique constraint
+or unique partial index preventing two conflicting operations. Explain
+what B can see before A commits, when it waits, and the final result.
+Include a starting-data check, SQL for each session, clear STOP/switch
+instructions, expected results, rollback after an expected error, and a
+final query proving the rule held. Label expected results as predictions.
+
+Do not disable constraints, delete data, assume hard-coded generated IDs,
+or run both sessions as a single script. If my schema needs a different
+control mechanism, explain it and propose the smallest suitable test.
+Do not claim that isolation alone prevents every conflicting operation.
+Keep explanations short. Use two screenshots: waiting and final outcome.</code></pre><p>After running your tests, use this to draft the README:</p>
+<pre><code class="language-text">Draft my MIT 8103 Portfolio 3 README in simple language.
+
+MY WORK AND OBSERVED RESULTS
+[ATTACH MY THREE SQL FILES AND PASTE THE ACTUAL COMMIT, ROLLBACK,
+ISOLATION, WAITING/ERROR AND FINAL-CHECK OUTPUTS.
+LIST MY EXACT FILENAMES AND SAVED SCREENSHOTS.]
+
+Use exactly these headings:
+# Portfolio 3 Transactions and Concurrency
+## Commit and rollback
+## Isolation and concurrency control
+## Conclusion
+## Files
+## References
+
+Use one short paragraph under each of the first three sections, matching
+the library example's length. Explain the actual controls and their limits.
+Link my actual SQL files and screenshots/ using relative paths. Cite only
+documentation used. Do not invent observations or copy library facts into
+my case. If evidence is missing or unexpected, ask what needs checking
+instead of claiming the exercise succeeded.</code></pre><h2>7. Save to GitHub</h2>
+<p>Save your files with <strong>Cmd+S</strong> or <strong>Ctrl+S</strong>. Use the separate <code>$</code> terminal for Git, not either PostgreSQL prompt. Run each line separately:</p>
+<pre><code class="language-bash">git diff --check
+git diff
+git add portfolio-3-transactions-concurrency/
+git diff --cached --stat
+git commit -m &quot;Demonstrate isolation and concurrency control&quot;
+git push origin main
+git status</code></pre><p>Press <strong>q</strong> to leave a scrolling diff. Check the staged filenames before committing. Open the README on GitHub and check its links and three screenshots.</p>
+<p><strong>Portfolio 3 evidence:</strong> commit and rollback (Step 14), isolation and the concurrency control (Step 15), SQL files, three screenshots and a short README.</p>
+<p><strong>Next: <a href="16_Set_Up_MongoDB.html">Step 16 — Set up MongoDB in Codespaces</a>.</strong></p>
+<p><a href="14_Commit_And_Rollback.html">Back to Step 14</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="14_Commit_And_Rollback.html">← Previous</a><a href="16_Set_Up_MongoDB.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

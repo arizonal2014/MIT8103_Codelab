@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 6 Create the ER diagram | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a aria-current="page" href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 6 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="05_Entities_Keys_Relationships.html">← Previous</a><a href="07_Normalisation.html">Next step →</a></nav><article><h1>Step 6 Create the ER diagram</h1>
+<p>Portfolio 1 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires an <strong>ER diagram</strong>: a picture of the tables and their relationships.</p>
+<p>Mermaid turns text into a diagram on GitHub. No download or upload is needed. <a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams">GitHub&#39;s diagram guide</a>.</p>
+<h2>1. Prepare the diagram</h2>
+<p>See the <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-1-database-design/Harrison_Perete_202600001_P1_ERDiagram.md">completed library ER diagram</a> for an example of the result. Its four boxes show the tables, and the lines show how they connect.</p>
+<p>Use the prompt below with your design from Step 5. Save the response using the filename in Step 2, replacing the name and ID with yours.</p>
+<pre><code class="language-text">I am completing MIT 8103 Portfolio 1. Turn my agreed database design
+below into one Markdown file containing a Mermaid ER diagram.
+
+MY DATABASE DESIGN
+[PASTE YOUR DESIGN FROM STEP 5]
+
+Start with the title: &quot;[MY CASE STUDY NAME] ER Diagram&quot;.
+Include one fenced mermaid block starting with erDiagram.
+Use direction LR so the diagram runs left to right.
+Use exactly the tables, fields, types and relationships in my design.
+Mark primary keys PK, foreign keys FK and unique fields UK.
+Show whether each relationship means exactly one, zero or one,
+or zero or many. Do not add or change any business rules.
+After the diagram, explain PK, FK, UK and the relationship symbols
+in simple words. Include one small example from my case study.
+State which fields are optional and briefly note any rules that
+need additional constraints or transaction logic.
+Write this as a short assessment answer in present tense, not a plan.
+Return only the Markdown file contents, without an outer code fence.
+Do not generate SQL or claim anything has been executed.</code></pre><h2>2. Save it in Codespaces</h2>
+<ol>
+<li>Right-click <code>portfolio-1-database-design</code> in Explorer and choose <strong>New File</strong>.</li>
+<li>Name it <code>Harrison_Perete_202600001_P1_ERDiagram.md</code>. Replace the name and ID with yours.</li>
+<li>Paste the complete Markdown and save it. Seeing diagram text in the editor is normal.</li>
+</ol>
+<h2>3. Send it to GitHub</h2>
+<p>Run each command separately, using your own filename:</p>
+<pre><code class="language-bash">git diff --check
+git add portfolio-1-database-design/Harrison_Perete_202600001_P1_ERDiagram.md
+git commit -m &quot;Add ER diagram&quot;
+git push origin main</code></pre><h2>4. View and check it</h2>
+<p>Open your repository on GitHub, open the Portfolio 1 folder, then open the ERDiagram.md file. Choose <strong>Preview</strong> if it displays code.</p>
+<p>For the library example, check that four boxes appear: member, book, book_copy and loan. The lines should match the relationships from Step 5. For example, one member can have several loans, but each loan belongs to one member.</p>
+<p><img src="images/11_ER_Diagram_On_GitHub.jpg" alt="Library ER diagram on GitHub"></p>
+<p>If GitHub reports a diagram error, copy the error and diagram text into your AI assistant and ask it to fix the syntax without changing the design. Save, commit and push the correction.</p>
+<p><strong>Using only GitHub&#39;s website?</strong> Open the Portfolio 1 folder, choose <strong>Add file → Create new file</strong>, enter the filename, paste the contents and choose <strong>Commit changes</strong>. Codespaces users then run <code>git pull --ff-only</code> before continuing there.</p>
+<p><strong>Next: <a href="07_Normalisation.html">Step 7 — Explain normalisation</a>.</strong></p>
+<p><a href="05_Entities_Keys_Relationships.html">Back to Step 5</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="05_Entities_Keys_Relationships.html">← Previous</a><a href="07_Normalisation.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

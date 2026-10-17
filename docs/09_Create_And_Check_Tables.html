@@ -1,0 +1,124 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 9 Create and check the tables | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a aria-current="page" href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 9 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="08_Set_Up_PostgreSQL.html">← Previous</a><a href="10_Insert_And_Test_Data.html">Next step →</a></nav><article><h1>Step 9 Create and check the tables</h1>
+<p>Portfolio 1 in Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires a <strong>relational schema, keys and constraints</strong>. Here, the design becomes actual PostgreSQL tables.</p>
+<h2>1. Prepare your SQL file</h2>
+<p>The library example uses <a href="Harrison_Perete_202600001_P1_Schema.sql">this SQL file</a>. SQL is the text PostgreSQL reads to create the tables.</p>
+<p>For your own case study, use this prompt:</p>
+<pre><code class="language-text">I am completing MIT 8103 Portfolio 1. Write a PostgreSQL 16 schema
+from my agreed design below.
+
+MY DESIGN AND NUMBERED BUSINESS RULES
+[PASTE YOUR DESIGN FROM STEP 5]
+
+Return only SQL file contents, with short, simple comments.
+Keep exactly my agreed tables, fields, types and relationships.
+Create the tables in public, with referenced tables created first.
+Use automatically generated identity IDs and primary keys as designed.
+Include required NOT NULL fields, UNIQUE rules, foreign keys and CHECKs.
+Keep optional fields nullable. Use a partial unique index if a rule
+requires uniqueness only for some rows, such as open loans.
+Wrap the statements in BEGIN and COMMIT. Do not insert sample data.
+Do not use DROP, IF NOT EXISTS, passwords or database-creation commands.
+Do not claim that rules needing later transaction logic are enforced
+by the table definitions; mention those limits in a short SQL comment.</code></pre><p>In Codespaces, create a file in <code>portfolio-1-database-design</code> named <code>Harrison_Perete_202600001_P1_Schema.sql</code>, using your own name and ID. Paste the reviewed SQL and save it.</p>
+<p>The <code>.sql</code> file stores the commands. Saving it does not create tables; running its commands does.</p>
+<p>Pictures go in <code>portfolio-1-database-design/screenshots</code>. If that folder does not exist yet, right-click <code>portfolio-1-database-design</code> in Explorer → <strong>New Folder…</strong> → enter <code>screenshots</code>. Keep your SQL files in the parent folder.</p>
+<p>In every filename below, replace <code>Harrison_Perete_202600001</code> with your own <strong>Surname_Firstname_StudentID</strong>. For another case study, use your own table names instead of Member, Book or Loan. Use no spaces. Keep the picture&#39;s actual extension: <code>.png</code> or <code>.jpg</code>.</p>
+<p>On a phone or tablet, use its screenshot buttons. If you need to rename a picture after uploading, right-click it in Codespaces Explorer and choose <strong>Rename…</strong>.</p>
+<h2>2. Check where you are</h2>
+<p>Use the PostgreSQL session from Step 8. The prompt should show your database name, such as <code>library_portfolio=#</code>.</p>
+<pre><code class="language-sql">SELECT current_database();</code></pre><p>For this demo, the result must be <code>library_portfolio</code>. Then enter:</p>
+<pre><code class="language-text">\dt public.*</code></pre><p>Before the first run, the practice database should have no tables. If it already contains tables, stop and check them; do not delete them or run the schema again blindly.</p>
+<h2>3. Create the tables, one at a time</h2>
+<p>The complete library commands are below, in order. Run each block once in PostgreSQL. For a different case study, use the matching commands from your own SQL file.</p>
+<p>If a command fails, enter <code>ROLLBACK;</code>, fix your SQL, then restart this group. Do not continue after an error.</p>
+<h3>Start the group</h3>
+<pre><code class="language-sql">BEGIN;</code></pre><p>Expected result: <code>BEGIN</code>.</p>
+<h3>Create member</h3>
+<p>Copy this whole block and press <strong>Enter</strong>:</p>
+<pre><code class="language-sql">CREATE TABLE public.member (
+    member_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    membership_number VARCHAR(30) NOT NULL UNIQUE,
+    full_name VARCHAR(120) NOT NULL,
+    email VARCHAR(254) NOT NULL UNIQUE
+);</code></pre><p>Expected result: <code>CREATE TABLE</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_MemberCreation.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture. Check that it appears in the folder.</p>
+<h3>Create book</h3>
+<pre><code class="language-sql">CREATE TABLE public.book (
+    book_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    isbn VARCHAR(17) NOT NULL UNIQUE,
+    title VARCHAR(200) NOT NULL
+);</code></pre><p>Expected result: <code>CREATE TABLE</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_BookCreation.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<h3>Create book_copy</h3>
+<pre><code class="language-sql">CREATE TABLE public.book_copy (
+    copy_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    book_id BIGINT NOT NULL,
+    barcode VARCHAR(30) NOT NULL UNIQUE,
+    CONSTRAINT book_copy_book_fk
+        FOREIGN KEY (book_id) REFERENCES public.book (book_id)
+);</code></pre><p>Expected result: <code>CREATE TABLE</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_BookCopyCreation.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<h3>Create loan</h3>
+<pre><code class="language-sql">CREATE TABLE public.loan (
+    loan_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    member_id BIGINT NOT NULL,
+    copy_id BIGINT NOT NULL,
+    borrowed_at TIMESTAMPTZ NOT NULL,
+    due_at TIMESTAMPTZ NOT NULL,
+    returned_at TIMESTAMPTZ,
+    CONSTRAINT loan_member_fk
+        FOREIGN KEY (member_id) REFERENCES public.member (member_id),
+    CONSTRAINT loan_copy_fk
+        FOREIGN KEY (copy_id) REFERENCES public.book_copy (copy_id),
+    CONSTRAINT loan_due_after_borrowing
+        CHECK (due_at &gt; borrowed_at),
+    CONSTRAINT loan_return_not_before_borrowing
+        CHECK (returned_at IS NULL OR returned_at &gt;= borrowed_at)
+);</code></pre><p>Expected result: <code>CREATE TABLE</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_LoanCreation.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><code>NOT NULL</code> means a value is required. <code>UNIQUE</code> prevents repeats. <code>REFERENCES</code> links tables. <code>CHECK</code> checks a rule, such as the due date being after borrowing. <code>public</code> is the standard area where these tables are stored.</p>
+<h3>Add the one-open-loan rule</h3>
+<pre><code class="language-sql">CREATE UNIQUE INDEX loan_one_open_copy
+    ON public.loan (copy_id)
+    WHERE returned_at IS NULL;</code></pre><p>Expected result: <code>CREATE INDEX</code>. This checks only loans with no return date. Copy 10 can have many past loans, but no more than one open loan.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_OpenLoanIndex.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<h3>Save the group</h3>
+<pre><code class="language-sql">COMMIT;</code></pre><p>Expected result: <code>COMMIT</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_SchemaCommit.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><img src="images/19_Create_Schema.jpg" alt="Library table creation and commit"></p>
+<h2>4. List the tables</h2>
+<pre><code class="language-text">\dt public.*</code></pre><p>The library result should list member, book, book_copy and loan.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_TableList.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><img src="images/20_List_Tables.jpg" alt="Library table list"></p>
+<h2>5. Inspect the keys and constraints</h2>
+<p>Run each check below. You do not need to run <code>CREATE TABLE</code> again.</p>
+<p>If output pauses at <code>(END)</code>, press <strong>q</strong> to return to the PostgreSQL prompt.</p>
+<h3>Check member</h3>
+<pre><code class="language-text">\d public.member</code></pre><p>Look for the primary key on member_id and unique membership_number and email under <strong>Indexes</strong>. Every field says <code>not null</code>, meaning it is required.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_MemberConstraints.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><img src="images/21_Member_Constraints.jpg" alt="Library member keys and constraints"></p>
+<h3>Check book</h3>
+<pre><code class="language-text">\d public.book</code></pre><p>Look for the primary key on book_id, unique isbn and <code>not null</code> on every field.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_BookConstraints.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><img src="images/22_Book_Constraints.jpg" alt="Library book keys and constraints"></p>
+<h3>Check book_copy</h3>
+<pre><code class="language-text">\d public.book_copy</code></pre><p>Look for the primary key on copy_id, unique barcode and the foreign key linking book_id to book. Every field is required.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_BookCopyConstraints.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture.</p>
+<p><img src="images/23_BookCopy_Constraints.jpg" alt="Library book copy keys and constraints"></p>
+<h3>Check loan</h3>
+<pre><code class="language-text">\d public.loan</code></pre><p>Look for the primary key, two foreign keys, two date checks and loan_one_open_copy under <strong>Indexes</strong>. returned_at is the only optional field: its <strong>Nullable</strong> entry is blank rather than <code>not null</code>.</p>
+<p>Take a screenshot of the command and result: <strong>Mac:</strong> Shift + Command + 4; <strong>Windows:</strong> Windows + Shift + S. Save it as <code>Harrison_Perete_202600001_P1_LoanConstraints.png</code>. In Codespaces Explorer, right-click its <code>screenshots</code> folder → <strong>Upload…</strong> → select the picture. Open an uploaded picture to check that its text is readable.</p>
+<p><img src="images/24_Loan_Constraints.jpg" alt="Library loan keys and constraints"></p>
+<p>These checks confirm the table definitions. Sample inserts and rejected invalid records are checked in the next step. The return-once operation needs transaction logic later; these tables alone do not enforce that workflow.</p>
+<h2>6. Save the SQL and screenshots to GitHub</h2>
+<p>Open a <strong>new terminal</strong> using <strong>Terminal → New Terminal</strong>. Leave the PostgreSQL terminal open. Run these commands at the new terminal&#39;s <code>$</code> prompt, using your own filename:</p>
+<pre><code class="language-bash">git diff --check
+git add portfolio-1-database-design/
+git diff --cached --stat
+git commit -m &quot;Add schema and Portfolio 1 table evidence&quot;
+git push origin main</code></pre><p>The <code>git add</code> command includes the SQL and uploaded pictures in this folder. Check the list shown by <code>git diff --cached --stat</code> before committing. Never commit database passwords.</p>
+<p>See the <a href="https://github.com/arizonal2014/Harrison_Perete_202600001/blob/main/portfolio-1-database-design/Harrison_Perete_202600001_P1_Schema.sql">completed library SQL file on GitHub</a>.</p>
+<p>Reference: <a href="https://www.postgresql.org/docs/16/ddl-constraints.html">PostgreSQL 16 constraints</a>.</p>
+<p><strong>Next: <a href="10_Insert_And_Test_Data.html">Step 10 — Add sample records and test the rules</a>.</strong></p>
+<p><a href="08_Set_Up_PostgreSQL.html">Back to Step 8</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="08_Set_Up_PostgreSQL.html">← Previous</a><a href="10_Insert_And_Test_Data.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

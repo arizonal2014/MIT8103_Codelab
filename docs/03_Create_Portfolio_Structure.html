@@ -1,0 +1,59 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 3 Create your portfolio folders and first commit | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a aria-current="page" href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 3 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="02_Open_Codespaces.html">← Previous</a><a href="04_Choose_Your_Case_Study.html">Next step →</a></nav><article><h1>Step 3 Create your portfolio folders and first commit</h1>
+<p>Section 5 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> suggests separate folders for the five portfolios and asks for progressive GitHub commits. We will create that structure now.</p>
+<p><strong>Use your own name and student ID wherever you see <code>Harrison_Perete_202600001</code>.</strong> Run the terminal commands from your repository folder in Codespaces.</p>
+<h2>Rename your README</h2>
+<p>The previous step created <code>README.md</code> automatically. Rename it to follow the submission filename convention:</p>
+<pre><code class="language-bash">mv README.md Harrison_Perete_202600001_README.md</code></pre><p>If your file is already correctly named, skip this command.</p>
+<h2>Add your details</h2>
+<p>Double-click the renamed file in Explorer. Replace its contents with the following, using your own details:</p>
+<pre><code class="language-markdown"># MIT 8103 Advanced Database Systems Portfolio
+
+Name: Perete Harrison
+
+Student ID: 202600001 (dummy ID for the demonstration)
+
+## Case study
+
+To be selected in the next step.
+
+## Portfolio folders
+
+- portfolio-1-database-design: design, schema and normalisation.
+- portfolio-2-query-optimisation: queries, plans and performance analysis.
+- portfolio-3-transactions-concurrency: commit, rollback and concurrency.
+- portfolio-4-nosql: NoSQL model, implementation and suitability.
+- portfolio-5-distributed-cloud: distributed or cloud database exercise.
+
+Each folder will contain its scripts, notes and execution evidence.</code></pre><p>Save with <strong>Ctrl+S</strong> on Windows/Linux or <strong>Cmd+S</strong> on macOS. If the file opens as a rendered preview, choose <strong>Open Source File</strong> to edit its text.</p>
+<h2>Create the five folders</h2>
+<p>In the terminal, run each line:</p>
+<pre><code class="language-bash">mkdir -p portfolio-1-database-design
+mkdir -p portfolio-2-query-optimisation
+mkdir -p portfolio-3-transactions-concurrency
+mkdir -p portfolio-4-nosql
+mkdir -p portfolio-5-distributed-cloud</code></pre><p><code>mkdir</code> creates a directory. The <code>-p</code> option allows the command to succeed if the directory already exists.</p>
+<p>Git does not store empty directories. Add an empty README to each folder so it can be saved to GitHub. We will fill these files during their respective activities.</p>
+<pre><code class="language-bash">touch portfolio-1-database-design/Harrison_Perete_202600001_P1_README.md
+touch portfolio-2-query-optimisation/Harrison_Perete_202600001_P2_README.md
+touch portfolio-3-transactions-concurrency/Harrison_Perete_202600001_P3_README.md
+touch portfolio-4-nosql/Harrison_Perete_202600001_P4_README.md
+touch portfolio-5-distributed-cloud/Harrison_Perete_202600001_P5_README.md</code></pre><p><code>touch</code> creates an empty file if it does not already exist. Expand the folders in Explorer to see the files.</p>
+<p><img src="images/06_Portfolio_Structure.jpg" alt="Personalised README and the five portfolio folders in Codespaces"></p>
+<h2>Save your changes to GitHub</h2>
+<p>Run each command separately.</p>
+<p>Check what changed:</p>
+<pre><code class="language-bash">git status</code></pre><p>Prepare the changes for the next saved version:</p>
+<pre><code class="language-bash">git add -A</code></pre><p>Review the files you are about to save:</p>
+<pre><code class="language-bash">git diff --cached --stat</code></pre><p>You should see your personalised README, five portfolio README files and the removal of the old <code>README.md</code>. Git may recognise the README change as a rename instead.</p>
+<p>Create a commit, which records this version of your work:</p>
+<pre><code class="language-bash">git commit -m &quot;Set up portfolio folders and README&quot;</code></pre><p>Send the commit to GitHub:</p>
+<pre><code class="language-bash">git push origin main</code></pre><p>Check again:</p>
+<pre><code class="language-bash">git status</code></pre><p><strong>Expected result:</strong> <code>Your branch is up to date with &#39;origin/main&#39;</code> and <code>nothing to commit, working tree clean</code>.</p>
+<p><img src="images/07_First_Commit_Pushed.jpg" alt="Successful first commit, push and clean Git status in the Codespaces terminal"></p>
+<h2>Confirm on GitHub</h2>
+<p>Open your repository on GitHub in another browser tab. Refresh it if necessary. Check that the five folders, personalised README and commit message are visible.</p>
+<p><img src="images/08_Structure_On_GitHub.jpg" alt="Five portfolio folders and the personalised README saved on GitHub"></p>
+<p>GitHub may still display <strong>Add a README</strong> because the personalised filename is not its standard <code>README.md</code>. Your file is present in the file list; click its name to read it.</p>
+<p><strong>Next: <a href="04_Choose_Your_Case_Study.html">Step 4 — Choose and describe your case study</a>.</strong></p>
+<p><a href="02_Open_Codespaces.html">Back to Step 2</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="02_Open_Codespaces.html">← Previous</a><a href="04_Choose_Your_Case_Study.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

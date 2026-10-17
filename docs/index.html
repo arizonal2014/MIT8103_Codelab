@@ -1,0 +1,89 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MIT 8103 Advanced Database Systems Codelab | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a  href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Contents · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="01_Create_Your_Repository.html">Start the codelab →</a></nav><article><h1>MIT 8103 Advanced Database Systems Codelab</h1>
+<p><a href="https://arizonal2014.github.io/MIT8103_Codelab/">Open the step-by-step tutorial</a>.</p>
+<p>This step-by-step guide helps you complete the MIT 8103 continuous assessment. Choose a case study, use it for all five portfolio activities, and save evidence of your work as you go.</p>
+<h2>What you will produce</h2>
+<p>The assessment is worth 40 marks. You will submit practical database work and a short summary.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Required work and evidence</th>
+<th align="right">Marks</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Portfolio 1: Database Design and Modelling</td>
+<td>Case-study description, ER diagram, relational schema, keys, constraints and normalisation explanation</td>
+<td align="right">7</td>
+</tr>
+<tr>
+<td>Portfolio 2: Query Processing and Optimisation</td>
+<td>SQL queries, results, execution plans, optimisation evidence and a brief performance analysis</td>
+<td align="right">7</td>
+</tr>
+<tr>
+<td>Portfolio 3: Transactions and Concurrency</td>
+<td>Commit, rollback, isolation and a concurrency issue or control mechanism, supported by outputs or screenshots</td>
+<td align="right">7</td>
+</tr>
+<tr>
+<td>Portfolio 4: NoSQL and Advanced Data Models</td>
+<td>A NoSQL model for the same case study, implementation evidence and an explanation of suitability</td>
+<td align="right">7</td>
+</tr>
+<tr>
+<td>Portfolio 5: Distributed and Cloud Database Exercise</td>
+<td>A case-related discussion or setup covering relevant concepts such as replication, sharding, availability, consistency or deployment</td>
+<td align="right">6</td>
+</tr>
+<tr>
+<td>Final documentation</td>
+<td>A 2–3-page summary covering the activities, selected case study, GitHub link, evidence, individual reflection, references and AI-use declaration where applicable</td>
+<td align="right">6</td>
+</tr>
+<tr>
+<td>Total</td>
+<td></td>
+<td align="right">40</td>
+</tr>
+</tbody></table>
+<p>Source: Sections 3 and 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a>.</p>
+<h2>Before you begin</h2>
+<p>You will need:</p>
+<ul>
+<li>A computer with a browser and a reliable internet connection.</li>
+<li>A GitHub account. If you do not have one, <a href="https://github.com/signup">create an account</a>.</li>
+<li>The assessment question document.</li>
+<li>Your preferred AI assistant, if you want to use the prompts provided in this guide.</li>
+</ul>
+<p>GitHub is a website for storing project files and keeping a history of changes. Your assessment repository is the project folder you keep on GitHub. We will create it together and save your work in stages.</p>
+<p>Database setup is covered later. We will use PostgreSQL in GitHub Codespaces, a browser-based workspace. You can also use an existing PostgreSQL connection.</p>
+<h2>How to follow the steps</h2>
+<ol>
+<li>Read the task and its assessment requirement.</li>
+<li>Follow the instructions using your own case study. Replace the placeholders in any prompts you use.</li>
+<li>Run the commands where indicated and check the results.</li>
+<li>Save the scripts, outputs and screenshots requested in that step.</li>
+<li>Save your progress to GitHub at each checkpoint.</li>
+</ol>
+<p>Work through one step at a time. Use your actual results when explaining what happened.</p>
+<p><strong>Start here: <a href="01_Create_Your_Repository.html">Step 1 — Create your assessment repository</a>.</strong></p>
+<p>Then follow <a href="02_Open_Codespaces.html">Step 2 — Open GitHub Codespaces</a>.</p>
+<p><a href="03_Create_Portfolio_Structure.html">Step 3 — Create your portfolio folders and first commit</a>.</p>
+<p><a href="04_Choose_Your_Case_Study.html">Step 4 — Choose and describe your case study</a>.</p>
+<p><a href="05_Entities_Keys_Relationships.html">Step 5 — Identify entities, attributes, keys and relationships</a>.</p>
+<p><a href="06_Create_ER_Diagram.html">Step 6 — Create the ER diagram</a>.</p>
+<p><a href="07_Normalisation.html">Step 7 — Explain normalisation</a>.</p>
+<p><a href="08_Set_Up_PostgreSQL.html">Step 8 — Set up PostgreSQL</a>.</p>
+<p><a href="09_Create_And_Check_Tables.html">Step 9 — Create and check the tables</a>.</p>
+<p><a href="10_Insert_And_Test_Data.html">Step 10 — Add sample records and test the rules</a>.</p>
+<p><a href="11_Update_README_And_Save_Portfolio_1.html">Step 11 — Update the README and save Portfolio 1</a>.</p>
+<p><a href="12_Run_SQL_Queries.html">Step 12 — Run useful SQL queries</a>.</p>
+<p><a href="13_Compare_Plans_And_Add_Index.html">Step 13 — Compare execution plans and add an index</a>.</p>
+<p><a href="14_Commit_And_Rollback.html">Step 14 — Save or undo a transaction</a>.</p>
+<p><a href="15_Test_Two_Database_Sessions.html">Step 15 — Test two sessions borrowing the same copy</a>.</p>
+<p><a href="16_Set_Up_MongoDB.html">Step 16 — Set up MongoDB in Codespaces</a>.</p>
+<p><a href="17_Model_And_Query_MongoDB.html">Step 17 — Store and query library events in MongoDB</a>.</p>
+<p><a href="18_Explain_Distributed_And_Cloud_Databases.html">Step 18 — Explain distributed and cloud databases</a>.</p>
+<p><a href="19_Prepare_The_Final_Summary.html">Step 19 — Prepare the final 2-3-page summary</a>.</p>
+</article><nav class="pager" aria-label="Step navigation"><a href="index.html">← Contents</a><a href="01_Create_Your_Repository.html">Start the codelab →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>

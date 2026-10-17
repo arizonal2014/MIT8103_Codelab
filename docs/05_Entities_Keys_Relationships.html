@@ -1,0 +1,161 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Step 5 Identify entities, attributes, keys and relationships | MIT 8103 Codelab</title><link rel="stylesheet" href="site.css"></head><body><header><a href="index.html">MIT 8103 <strong>Codelab</strong></a><a href="https://github.com/arizonal2014/MIT8103_Codelab">GitHub source ↗</a></header><div class="layout"><aside><details open><summary>All 19 steps</summary><nav aria-label="Codelab steps"><a href="index.html">Overview</a><a  href="01_Create_Your_Repository.html"><span>01</span>Create your assessment repository</a><a  href="02_Open_Codespaces.html"><span>02</span>Open your workspace in GitHub Codespaces</a><a  href="03_Create_Portfolio_Structure.html"><span>03</span>Create your portfolio folders and first commit</a><a  href="04_Choose_Your_Case_Study.html"><span>04</span>Choose and describe your case study</a><a aria-current="page" href="05_Entities_Keys_Relationships.html"><span>05</span>Identify entities, attributes, keys and relationships</a><a  href="06_Create_ER_Diagram.html"><span>06</span>Create the ER diagram</a><a  href="07_Normalisation.html"><span>07</span>Explain normalisation</a><a  href="08_Set_Up_PostgreSQL.html"><span>08</span>Set up PostgreSQL</a><a  href="09_Create_And_Check_Tables.html"><span>09</span>Create and check the tables</a><a  href="10_Insert_And_Test_Data.html"><span>10</span>Add sample records and test the rules</a><a  href="11_Update_README_And_Save_Portfolio_1.html"><span>11</span>Update the README and save Portfolio 1</a><a  href="12_Run_SQL_Queries.html"><span>12</span>Run useful SQL queries</a><a  href="13_Compare_Plans_And_Add_Index.html"><span>13</span>Compare execution plans and add an index</a><a  href="14_Commit_And_Rollback.html"><span>14</span>Save or undo a transaction</a><a  href="15_Test_Two_Database_Sessions.html"><span>15</span>Test two sessions borrowing the same copy</a><a  href="16_Set_Up_MongoDB.html"><span>16</span>Set up MongoDB in Codespaces</a><a  href="17_Model_And_Query_MongoDB.html"><span>17</span>Store and query library events in MongoDB</a><a  href="18_Explain_Distributed_And_Cloud_Databases.html"><span>18</span>Explain distributed and cloud databases</a><a  href="19_Prepare_The_Final_Summary.html"><span>19</span>Prepare the final 2-3-page summary</a></nav></details></aside><main id="main"><div class="eyebrow">Step 5 of 19 · Library Borrowing System</div><nav class="pager" aria-label="Step navigation"><a href="04_Choose_Your_Case_Study.html">← Previous</a><a href="06_Create_ER_Diagram.html">Next step →</a></nav><article><h1>Step 5 Identify entities, attributes, keys and relationships</h1>
+<p>Section 4 of the <a href="https://lms-assets.miva.university/course-materials/mit-8103-advanced-database-systems-ca-september-cohort-2026.pdf">assessment brief</a> requires an ER diagram, relational schema, keys and constraints for Portfolio 1. This step records the design decisions needed for those deliverables.</p>
+<h2>Identify your entities</h2>
+<p>Read your case study from Step 4. Here are the main terms:</p>
+<ul>
+<li><strong>Entity:</strong> something the database keeps records of. Example: a library member.</li>
+<li><strong>Attribute:</strong> a detail about it. Example: the member&#39;s name or email.</li>
+<li><strong>Primary key (PK):</strong> the ID for one record. Example: member_id 1 identifies one member.</li>
+<li><strong>Foreign key (FK):</strong> an ID linking two tables. Example: member_id 1 in a loan tells me who borrowed the book.</li>
+<li><strong>Relationship:</strong> how records connect. Example: one member can have several loans.</li>
+</ul>
+<p>Save the following example, including its title, in the design file.</p>
+<h3>Library Borrowing System Database Design</h3>
+<h4>Entities</h4>
+<p>I chose four entities for my library borrowing system:</p>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Information stored</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>member</td>
+<td>A registered borrower</td>
+</tr>
+<tr>
+<td>book</td>
+<td>A catalogue record for a book edition</td>
+</tr>
+<tr>
+<td>book_copy</td>
+<td>One physical copy of a book</td>
+</tr>
+<tr>
+<td>loan</td>
+<td>One borrowing of a physical copy by a member</td>
+</tr>
+</tbody></table>
+<p>I kept book and book_copy separate. For example, the library may have three copies of <em>Things Fall Apart</em>. I record the book details once, give each copy its own barcode, and use the loan to record which copy a member borrowed.</p>
+<h4>Attributes and keys</h4>
+<p>I use an automatically generated ID for each record. In the tables below, <strong>unique</strong> means no repeated values. <strong>Required</strong> means the value cannot be <code>NULL</code> (missing); checking for blank text is a separate rule.</p>
+<table>
+<thead>
+<tr>
+<th>Entity</th>
+<th>Attributes and proposed PostgreSQL types</th>
+<th>Keys and required values</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>member</td>
+<td>member_id BIGINT; membership_number VARCHAR(30); full_name VARCHAR(120); email VARCHAR(254)</td>
+<td>PK: member_id. Unique: membership_number and email separately. All required.</td>
+</tr>
+<tr>
+<td>book</td>
+<td>book_id BIGINT; isbn VARCHAR(17); title VARCHAR(200)</td>
+<td>PK: book_id. Unique: isbn. All required.</td>
+</tr>
+<tr>
+<td>book_copy</td>
+<td>copy_id BIGINT; book_id BIGINT; barcode VARCHAR(30)</td>
+<td>PK: copy_id. FK: book_id → book.book_id. Unique: barcode. All required.</td>
+</tr>
+<tr>
+<td>loan</td>
+<td>loan_id BIGINT; member_id BIGINT; copy_id BIGINT; borrowed_at TIMESTAMPTZ; due_at TIMESTAMPTZ; returned_at TIMESTAMPTZ</td>
+<td>PK: loan_id. FKs: member_id → member.member_id; copy_id → book_copy.copy_id. All required except returned_at.</td>
+</tr>
+</tbody></table>
+<p><code>BIGINT</code> holds whole numbers, such as IDs. <code>VARCHAR(120)</code> holds text up to 120 characters. <code>TIMESTAMPTZ</code> holds a date and time with time-zone-aware input and display.</p>
+<p>I leave returned_at empty until the copy is returned. For example, a new loan has a borrowing date and due date, but no return date yet.</p>
+<p><strong>Design assumption:</strong> Each book edition has an ISBN, and each ISBN appears once in book.</p>
+<h4>Relationships</h4>
+<table>
+<thead>
+<tr>
+<th>Tables linked</th>
+<th>Relationship</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>book → book_copy</td>
+<td>One to many</td>
+<td>A book record can have zero or more copies; each copy belongs to exactly one book record.</td>
+</tr>
+<tr>
+<td>member → loan</td>
+<td>One to many</td>
+<td>A member can have zero or more loans; each loan belongs to exactly one member.</td>
+</tr>
+<tr>
+<td>book_copy → loan</td>
+<td>One to many over time</td>
+<td>A copy can have zero or more historical loans; each loan refers to exactly one copy.</td>
+</tr>
+</tbody></table>
+<p>For example, copy 10 can be borrowed in January and again in February. I keep both loan records, but only one can be open at a time. An open loan has no return date. A foreign key links the records; it does not stop the copy being lent twice at the same time.</p>
+<h4>Business rules and constraints</h4>
+<ul>
+<li><strong>Rules 1 and 2:</strong> Membership numbers, emails and copy barcodes are unique.</li>
+<li><strong>Rules 2 and 3:</strong> Required foreign keys link each copy to an existing book, and each loan to an existing member and copy.</li>
+<li><strong>Rule 4:</strong> Each copy has at most one open loan. The design uses a unique index on copy_id only for loans where returned_at is missing.</li>
+<li><strong>Rule 5:</strong> member_id can repeat in loan, allowing a member to borrow different copies.</li>
+<li><strong>Rules 6 and 7:</strong> Date checks require the due date to be after borrowing, and any return date to be on or after borrowing.</li>
+<li><strong>Rule 8:</strong> Returning a copy closes only its open loan and keeps the loan record. This rule needs transaction logic, not just a key.</li>
+</ul>
+<p>A copy is available when it has no open loan. A loan is overdue when its due date has passed and it has no return date. These can be calculated, so the design has no separate availability or overdue fields.</p>
+<h2>Adapt the design to your case study</h2>
+<p>Copy the worked example, including <strong>Library Borrowing System Database Design</strong>, into the prompt below. Add your own case study from Step 4.</p>
+<pre><code class="language-text">I am completing MIT 8103 Portfolio 1: Database Design and Modelling.
+
+MY AGREED CASE STUDY AND NUMBERED BUSINESS RULES
+[PASTE THE DESCRIPTION SAVED IN STEP 4]
+
+REFERENCE DESIGN
+[PASTE THE LIBRARY DESIGN FROM STEP 5]
+
+Create a short assessment design for MY case study, following the example.
+Start with the title: &quot;[MY CASE STUDY NAME] Database Design&quot;.
+Then use these headings:
+1. Entities — what the database keeps records of.
+2. Attributes and keys — fields, PostgreSQL types, PKs, FKs,
+   unique fields, and which values are required or optional.
+3. Relationships — how the tables connect. Explain both directions,
+   including whether zero records are allowed. Add a linking table if needed.
+4. Business rules and constraints — match every numbered rule to a database
+   check or operation. Explain any rule a key alone cannot enforce.
+5. Design assumptions — up to three points, only if needed.
+
+Use the smallest design that supports my agreed operations. Aim for four
+to six entities, but explain if a different number is necessary. This is
+a tutorial size guide, not an assessment rule. Propose the details yourself.
+Keep my existing scope and rules. Flag any necessary change explicitly.
+Do not rename library entities mechanically to fit a different domain.
+Avoid storing values that can be calculated unless you justify the choice.
+Present the design as an assessment answer, not a plan or instructions.
+Use present tense: &quot;Each copy has a unique barcode&quot;, not &quot;I will...&quot;.
+Use &quot;I chose&quot; only when briefly explaining a personal design decision.
+Use basic words and one small example. Explain any technical term needed.
+Do not claim the database has been created or tested.
+Keep the response under 650 words. Return only the title and sections above.
+Do not generate SQL, a diagram, normalisation or execution results yet.</code></pre><h2>Save the design</h2>
+<ol>
+<li>In Explorer, right-click your <code>portfolio-1-database-design</code> folder and choose <strong>New File</strong>.</li>
+<li>Name it <code>Harrison_Perete_202600001_P1_Design.md</code>, replacing the name and ID with yours.</li>
+<li>Save the title and your reviewed design in that file. For the library example, start with <code># Library Borrowing System Database Design</code>, then copy the sections above.</li>
+<li>Read your design alongside the business rules from Step 4. Check that each rule is covered. For example, every loan needs a member and a book copy, and the same copy cannot have two open loans. This is a reading check; no database commands are needed yet.</li>
+<li>Run each command separately in the terminal, using your own filename:</li>
+</ol>
+<pre><code class="language-bash">git diff --check
+git add portfolio-1-database-design/Harrison_Perete_202600001_P1_Design.md
+git commit -m &quot;Define entities keys and relationships&quot;
+git push origin main
+git status</code></pre><p><strong>Check:</strong> Open the saved design on GitHub. Explain why each entity exists and how its keys link it to the others. This is the proposed design; database enforcement will be verified during implementation.</p>
+<p><img src="images/10_Design_On_GitHub.jpg" alt="Library design saved on GitHub"></p>
+<p><strong>Next: <a href="06_Create_ER_Diagram.html">Step 6 — Create the ER diagram</a>.</strong></p>
+<p><a href="04_Choose_Your_Case_Study.html">Back to Step 4</a></p>
+</article><nav class="pager" aria-label="Step navigation"><a href="04_Choose_Your_Case_Study.html">← Previous</a><a href="06_Create_ER_Diagram.html">Next step →</a></nav><footer>Led by Perete Harrison · Use your own case study, records and results.</footer></main></div><script src="site.js" defer></script></body></html>
